@@ -576,17 +576,20 @@ function getEmbedUrl(url) {
   if (!url) return '';
   try {
     const u = new URL(url);
+    const host = u.hostname.toLowerCase();
     /* YouTube */
-    if (u.hostname.includes('youtube.com') || u.hostname.includes('youtu.be')) {
+    if (host === 'youtube.com' || host === 'www.youtube.com' || host === 'youtu.be') {
       let videoId = u.searchParams.get('v');
-      if (!videoId && u.hostname === 'youtu.be') videoId = u.pathname.slice(1);
-      if (videoId) return `https://www.youtube.com/embed/${videoId}`;
+      if (!videoId && host === 'youtu.be') videoId = u.pathname.slice(1);
+      if (videoId && /^[A-Za-z0-9_-]{1,30}$/.test(videoId)) {
+        return `https://www.youtube.com/embed/${videoId}`;
+      }
     }
     /* TikTok */
-    if (u.hostname.includes('tiktok.com')) {
+    if (host === 'tiktok.com' || host === 'www.tiktok.com') {
       const parts = u.pathname.split('/');
       const vidIdx = parts.indexOf('video');
-      if (vidIdx !== -1 && parts[vidIdx + 1]) {
+      if (vidIdx !== -1 && parts[vidIdx + 1] && /^\d+$/.test(parts[vidIdx + 1])) {
         return `https://www.tiktok.com/embed/v2/${parts[vidIdx + 1]}`;
       }
     }
