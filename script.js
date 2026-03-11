@@ -760,7 +760,6 @@ document.addEventListener('DOMContentLoaded', () => {
     renderSettings(data.settings);
     renderAchievements(data.achievements);
     renderPcSpecs(data.pcSpecs);
-    renderStats(data.stats);
     renderProfile(data.profile);
     renderClips(data.clips);
     renderTestimonials(data.testimonials);
