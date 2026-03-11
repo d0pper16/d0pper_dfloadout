@@ -1,5 +1,5 @@
 /* ============================================================
-   script.js — GUNSMITH DELTAFORCE by D0PPER. | Public Site Logic
+   script.js — D0PPER. | Public Site Logic
    ============================================================ */
 
 'use strict';
@@ -7,9 +7,36 @@
 /* ── DEFAULT DATA ────────────────────────────────────────── */
 const DEFAULT_DATA = {
   loadouts: [
-    { id: 'load-001', title: 'M4A1 CQB Build',    code: 'DF-M4A1-CQB-4xX9-K2L8-R7M3', category: 'Assault', featured: false },
-    { id: 'load-002', title: 'AWM Sniper Setup',   code: 'DF-AWM-SNP-8xZ4-P1Q6-T9N2',  category: 'Sniper',  featured: false },
-    { id: 'load-003', title: 'CI-19 All-Rounder',  code: 'DF-CI19-ALL-3xV7-B5W1-S4C6', category: 'SMG',     featured: false }
+    {
+      id: 'load-001',
+      weaponName: 'M4A1',
+      favorite: true,
+      category: 'Assault Rifle',
+      builds: [
+        { id: 'b-001-1', buildType: 'Build Stability',   code: 'M4-STAB-001-XR' },
+        { id: 'b-001-2', buildType: 'Build Close Range', code: 'M4-CQB-002-SR'  },
+        { id: 'b-001-3', buildType: 'Build Handling',    code: 'M4-HDL-003-FR'  }
+      ]
+    },
+    {
+      id: 'load-002',
+      weaponName: 'AWM',
+      favorite: true,
+      category: 'Sniper',
+      builds: [
+        { id: 'b-002-1', buildType: 'Build Long Range',  code: 'AWM-LR-001-XS' },
+        { id: 'b-002-2', buildType: 'Build Quickscope',  code: 'AWM-QS-002-YT' }
+      ]
+    },
+    {
+      id: 'load-003',
+      weaponName: 'CI-19',
+      favorite: false,
+      category: 'Assault Rifle',
+      builds: [
+        { id: 'b-003-1', buildType: 'Build All-Rounder', code: 'CI19-AR-001-ZZ' }
+      ]
+    }
   ],
   settings: {
     resolution:  '1920x1080',
@@ -51,12 +78,39 @@ const DEFAULT_DATA = {
     headset:  'HyperX Cloud II Wireless'
   },
   profile: {
-    nickname:  'd0pper',
-    playerId:  'DF-882741',
-    rank:      'Elite IV',
-    region:    'SEA',
-    playstyle: 'Aggressive Assault',
-    bio:       'Delta Force veteran focused on aggressive entry tactics and tight-quarters combat. Specializing in CQB loadouts and high-pressure engagements. Always pushing.'
+    currentIGN:     'd0pper',
+    currentTeam:    'Team Alpha',
+    birthplace:     'Indonesia',
+    birthdayDay:    15,
+    birthdayMonth:  'Maret',
+    displayPhoto:   '',
+    rank:           'Diamond',
+    region:         'Asia',
+    playstyle:      'Aggressive Assault',
+    bio:            'Delta Force enthusiast. Competitive FPS player.',
+    playerId:       'DF-123456',
+    teamHistory: [
+      {
+        id: 'th-001',
+        teamName:   'Solo Player',
+        startMonth: 'Januari',
+        startYear:  2024,
+        endMonth:   'Juni',
+        endYear:    2024,
+        isCurrent:  false,
+        ign:        'noob_d0pper'
+      },
+      {
+        id: 'th-002',
+        teamName:   'Team Alpha',
+        startMonth: 'Juli',
+        startYear:  2024,
+        endMonth:   '',
+        endYear:    0,
+        isCurrent:  true,
+        ign:        'd0pper'
+      }
+    ]
   },
   socialLinks: {
     youtube:   '#',
@@ -71,7 +125,41 @@ const DEFAULT_DATA = {
     { name: 'Recoil Control',  value: 82 },
     { name: 'Communication',   value: 90 },
     { name: 'Map Awareness',   value: 75 }
-  ]
+  ],
+  clips: [
+    {
+      id: 'clip-001',
+      title: 'Epic Squad Wipe',
+      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      visible: true
+    }
+  ],
+  testimonials: [
+    {
+      id: 'test-001',
+      name: 'Ahmad Rifai',
+      message: 'Loadout codes dari d0pper beneran OP! AWM setup bikin saya rank up cepat banget.',
+      censorName: false,
+      visible: true
+    },
+    {
+      id: 'test-002',
+      name: 'Budi Santoso',
+      message: 'Settings yang dibagiin sangat membantu, aim jadi lebih konsisten.',
+      censorName: true,
+      visible: true
+    }
+  ],
+  seasonStats: [
+    {
+      id: 'season-001',
+      season: 'Season 1',
+      adKpm: 2.5, adSpm: 350,
+      vuKpm: 1.8, vuSpm: 280,
+      radar: { shooting: 80, survival: 70, coop: 75, objective: 85, vehicle: 40 }
+    }
+  ],
+  visitorBaseCount: 0
 };
 
 /* ── LOCAL STORAGE HELPERS ───────────────────────────────── */
@@ -86,13 +174,17 @@ function getData(key) {
 
 function getAllData() {
   return {
-    loadouts:     getData('loadouts')     || DEFAULT_DATA.loadouts,
-    settings:     getData('settings')     || DEFAULT_DATA.settings,
-    achievements: getData('achievements') || DEFAULT_DATA.achievements,
-    pcSpecs:      getData('pcSpecs')      || DEFAULT_DATA.pcSpecs,
-    profile:      getData('profile')      || DEFAULT_DATA.profile,
-    socialLinks:  getData('socialLinks')  || DEFAULT_DATA.socialLinks,
-    stats:        getData('stats')        || DEFAULT_DATA.stats
+    loadouts:         getData('loadouts')         || DEFAULT_DATA.loadouts,
+    settings:         getData('settings')         || DEFAULT_DATA.settings,
+    achievements:     getData('achievements')     || DEFAULT_DATA.achievements,
+    pcSpecs:          getData('pcSpecs')          || DEFAULT_DATA.pcSpecs,
+    profile:          getData('profile')          || DEFAULT_DATA.profile,
+    socialLinks:      getData('socialLinks')      || DEFAULT_DATA.socialLinks,
+    stats:            getData('stats')            || DEFAULT_DATA.stats,
+    clips:            getData('clips')            || DEFAULT_DATA.clips,
+    testimonials:     getData('testimonials')     || DEFAULT_DATA.testimonials,
+    seasonStats:      getData('seasonStats')      || DEFAULT_DATA.seasonStats,
+    visitorBaseCount: getData('visitorBaseCount') !== null ? getData('visitorBaseCount') : DEFAULT_DATA.visitorBaseCount
   };
 }
 
@@ -168,10 +260,11 @@ function initHamburger() {
 function initVisitorCounter() {
   const el = document.getElementById('viewCount');
   if (!el) return;
-  let views = parseInt(localStorage.getItem('dfloadout_views') || '0', 10);
-  views += 1;
-  localStorage.setItem('dfloadout_views', views);
-  el.textContent = views.toLocaleString();
+  const baseCount = getData('visitorBaseCount') || 0;
+  let realViews = parseInt(localStorage.getItem('dfloadout_real_views') || '0', 10);
+  realViews += 1;
+  localStorage.setItem('dfloadout_real_views', realViews);
+  el.textContent = (baseCount + realViews).toLocaleString();
 }
 
 /* ── RENDER SOCIAL LINKS ─────────────────────────────────── */
@@ -201,6 +294,7 @@ function renderHeroStats(data) {
   if (!el) return;
 
   const visibleAch = data.achievements.filter(a => a.visible).length;
+  const profile = data.profile || {};
   el.innerHTML = `
     <div class="hero-stat">
       <div class="hero-stat-value">${data.loadouts.length}</div>
@@ -211,11 +305,11 @@ function renderHeroStats(data) {
       <div class="hero-stat-label">Achievements</div>
     </div>
     <div class="hero-stat">
-      <div class="hero-stat-value">${escHtml(data.profile.rank || '—')}</div>
+      <div class="hero-stat-value">${escHtml(profile.rank || '—')}</div>
       <div class="hero-stat-label">Rank</div>
     </div>
     <div class="hero-stat">
-      <div class="hero-stat-value">${escHtml(data.profile.region || '—')}</div>
+      <div class="hero-stat-value">${escHtml(profile.region || '—')}</div>
       <div class="hero-stat-label">Region</div>
     </div>
   `;
@@ -225,7 +319,13 @@ function renderHeroStats(data) {
 function renderLoadouts(loadouts) {
   const grid       = document.getElementById('loadoutGrid');
   const filterEl   = document.getElementById('loadoutFilter');
+  const noResults  = document.getElementById('loadoutNoResults');
+  const searchInput = document.getElementById('loadoutSearch');
+  const clearBtn   = document.getElementById('searchClearBtn');
   if (!grid) return;
+
+  let currentCategory = 'All';
+  let currentSearch   = '';
 
   if (!loadouts || loadouts.length === 0) {
     if (filterEl) filterEl.innerHTML = '';
@@ -248,46 +348,92 @@ function renderLoadouts(loadouts) {
       btn.addEventListener('click', () => {
         filterEl.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        const cat = btn.dataset.cat;
-        grid.querySelectorAll('.loadout-card, .featured-loadout-card').forEach(card => {
-          if (cat === 'All' || card.dataset.category === cat) {
-            card.style.display = '';
-          } else {
-            card.style.display = 'none';
-          }
-        });
+        currentCategory = btn.dataset.cat;
+        applyFilters();
       });
     });
   }
 
-  /* Sort: featured first */
-  const featured    = loadouts.filter(l => l.featured);
-  const nonFeatured = loadouts.filter(l => !l.featured);
-  const sorted      = [...featured, ...nonFeatured];
+  /* Search input */
+  if (searchInput) {
+    searchInput.addEventListener('input', () => {
+      currentSearch = searchInput.value.trim().toLowerCase();
+      if (clearBtn) clearBtn.style.display = currentSearch ? 'flex' : 'none';
+      applyFilters();
+    });
+  }
 
-  grid.innerHTML = sorted.map(l => {
-    const isFeat  = l.featured;
-    const catTag  = l.category ? `<span class="loadout-category-tag">${escHtml(l.category)}</span>` : '';
-    const featBadge = isFeat ? `<div class="featured-badge">⭐ FEATURED</div>` : '';
-    return `
-      <div class="${isFeat ? 'featured-loadout-card' : 'loadout-card'}" data-category="${escHtml(l.category || '')}">
-        ${featBadge}
-        <div class="loadout-card-header">
-          <div class="loadout-icon"><i class="fas fa-crosshairs"></i></div>
-          <div class="loadout-title">${escHtml(l.title)}</div>
-          ${catTag}
-        </div>
-        <div class="loadout-code-label">Weapon Code</div>
-        <div class="loadout-code">${escHtml(l.code)}</div>
-        <button class="copy-btn" data-code="${escHtml(l.code)}">
-          <i class="fas fa-copy"></i> Copy Code
-        </button>
-      </div>`;
-  }).join('');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      if (searchInput) { searchInput.value = ''; currentSearch = ''; }
+      clearBtn.style.display = 'none';
+      applyFilters();
+    });
+  }
 
-  grid.querySelectorAll('.copy-btn').forEach(btn => {
-    btn.addEventListener('click', handleCopy);
-  });
+  /* Sort: favorites first */
+  const favorites    = loadouts.filter(l => l.favorite);
+  const nonFavorites = loadouts.filter(l => !l.favorite);
+  const sorted       = [...favorites, ...nonFavorites];
+
+  function renderGrid(filtered) {
+    if (filtered.length === 0) {
+      grid.innerHTML = '';
+      if (noResults) {
+        const q = escHtml(currentSearch);
+        noResults.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-search"></i>
+            <p>No loadouts found${q ? ' for "<strong>' + q + '</strong>"' : ''}.</p>
+          </div>`;
+        noResults.style.display = 'block';
+      }
+      return;
+    }
+    if (noResults) noResults.style.display = 'none';
+
+    grid.innerHTML = filtered.map(l => {
+      const isFav   = l.favorite;
+      const catTag  = l.category ? `<span class="loadout-category-tag">${escHtml(l.category)}</span>` : '';
+      const favBadge = isFav ? `<div class="featured-badge">⭐ FAVORITE</div>` : '';
+      const buildsHtml = (l.builds && l.builds.length > 0)
+        ? l.builds.map(b => `
+          <div class="build-item">
+            <div class="build-type-label">${escHtml(b.buildType || 'Build')}</div>
+            <div class="build-code">${escHtml(b.code)}</div>
+            <button class="copy-btn" data-code="${escHtml(b.code)}">
+              <i class="fas fa-copy"></i> Copy Code
+            </button>
+          </div>`).join('')
+        : `<div class="build-empty"><i class="fas fa-info-circle"></i> No build codes added yet.</div>`;
+
+      return `
+        <div class="${isFav ? 'featured-loadout-card' : 'loadout-card'}" data-category="${escHtml(l.category || '')}" data-weapon="${escHtml((l.weaponName || '').toLowerCase())}">
+          ${favBadge}
+          <div class="loadout-card-header">
+            <div class="loadout-icon"><i class="fas fa-crosshairs"></i></div>
+            <div class="loadout-title">${escHtml(l.weaponName || 'Unknown Weapon')}</div>
+            ${catTag}
+          </div>
+          <div class="builds-list">${buildsHtml}</div>
+        </div>`;
+    }).join('');
+
+    grid.querySelectorAll('.copy-btn').forEach(btn => {
+      btn.addEventListener('click', handleCopy);
+    });
+  }
+
+  function applyFilters() {
+    const filtered = sorted.filter(l => {
+      const catMatch = currentCategory === 'All' || l.category === currentCategory;
+      const searchMatch = !currentSearch || (l.weaponName || '').toLowerCase().includes(currentSearch);
+      return catMatch && searchMatch;
+    });
+    renderGrid(filtered);
+  }
+
+  applyFilters();
 }
 
 function handleCopy(e) {
@@ -317,11 +463,11 @@ function renderSettings(settings) {
 
   const s = settings;
   const cards = [
-    { icon: 'fas fa-desktop',   label: 'Resolution',          value: s.resolution  || '—' },
-    { icon: 'fas fa-mouse',     label: 'DPI',                 value: s.dpi         || '—' },
-    { icon: 'fas fa-gamepad',   label: 'General Sensitivity', value: s.generalSens || '—' },
-    { icon: 'fas fa-crosshairs',label: 'ADS Sensitivity',     value: s.adsSens     || '—' },
-    { icon: 'fas fa-eye',       label: 'FOV',                 value: (s.fov || '—') + (s.fov ? '°' : '') }
+    { icon: 'fas fa-desktop',    label: 'Resolution',          value: s.resolution  || '—' },
+    { icon: 'fas fa-mouse',      label: 'DPI',                 value: s.dpi         || '—' },
+    { icon: 'fas fa-gamepad',    label: 'General Sensitivity', value: s.generalSens || '—' },
+    { icon: 'fas fa-crosshairs', label: 'ADS Sensitivity',     value: s.adsSens     || '—' },
+    { icon: 'fas fa-eye',        label: 'FOV',                 value: (s.fov || '—') + (s.fov ? '°' : '') }
   ];
 
   const scopeKeys  = ['1x','2x','4x','6x','8x'];
@@ -395,7 +541,94 @@ function renderAchievements(achievements) {
   });
 }
 
-/* ── LIGHTBOX ────────────────────────────────────────────── */
+/* ── RENDER CLIPS ────────────────────────────────────────── */
+function renderClips(clips) {
+  const grid = document.getElementById('clipsGrid');
+  if (!grid) return;
+
+  const visible = clips.filter(c => c.visible);
+
+  if (visible.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <i class="fas fa-film"></i>
+        <p>No clips added yet.</p>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = visible.map(c => {
+    const embedUrl = getEmbedUrl(c.url || '');
+    if (!embedUrl) return '';
+    return `
+      <div class="clip-card">
+        <div class="clip-title">${escHtml(c.title || 'Clip')}</div>
+        <div class="clip-embed-wrap">
+          <iframe src="${escHtml(embedUrl)}" frameborder="0" allowfullscreen
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            loading="lazy" title="${escHtml(c.title || 'Clip')}"></iframe>
+        </div>
+      </div>`;
+  }).filter(Boolean).join('');
+}
+
+function getEmbedUrl(url) {
+  if (!url) return '';
+  try {
+    const u = new URL(url);
+    /* YouTube */
+    if (u.hostname.includes('youtube.com') || u.hostname.includes('youtu.be')) {
+      let videoId = u.searchParams.get('v');
+      if (!videoId && u.hostname === 'youtu.be') videoId = u.pathname.slice(1);
+      if (videoId) return `https://www.youtube.com/embed/${videoId}`;
+    }
+    /* TikTok */
+    if (u.hostname.includes('tiktok.com')) {
+      const parts = u.pathname.split('/');
+      const vidIdx = parts.indexOf('video');
+      if (vidIdx !== -1 && parts[vidIdx + 1]) {
+        return `https://www.tiktok.com/embed/v2/${parts[vidIdx + 1]}`;
+      }
+    }
+  } catch (e) { /* ignore */ }
+  return '';
+}
+
+/* ── RENDER TESTIMONIALS ─────────────────────────────────── */
+function renderTestimonials(testimonials) {
+  const grid = document.getElementById('testimonialsGrid');
+  if (!grid) return;
+
+  const visible = testimonials.filter(t => t.visible);
+
+  if (visible.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <i class="fas fa-comment-dots"></i>
+        <p>No testimonials yet.</p>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = visible.map(t => {
+    const displayName = t.censorName ? censorName(t.name || '') : escHtml(t.name || 'Anonymous');
+    return `
+      <div class="testimonial-card">
+        <div class="testimonial-message">"${escHtml(t.message || '')}"</div>
+        <div class="testimonial-sender">— ${displayName}</div>
+      </div>`;
+  }).join('');
+}
+
+function censorName(name) {
+  if (!name) return 'Anonymous';
+  return name.split(' ').map(word => {
+    if (word.length <= 1) return escHtml(word);
+    return escHtml(word[0]) + '*'.repeat(word.length - 2) + escHtml(word[word.length - 1]);
+  }).join(' ');
+}
+
+/* ── RENDER LIGHTBOX ─────────────────────────────────────── */
 function initLightbox() {
   const lightbox = document.getElementById('lightbox');
   const overlay  = document.getElementById('lightboxOverlay');
@@ -481,36 +714,230 @@ function renderStats(stats) {
   fills.forEach(fill => observer.observe(fill));
 }
 
+/* ── RENDER SEASON STATS ─────────────────────────────────── */
+function renderSeasonStats(seasonStats) {
+  const grid = document.getElementById('seasonStatsGrid');
+  if (!grid) return;
+
+  if (!seasonStats || seasonStats.length === 0) {
+    grid.innerHTML = `<div class="empty-state"><i class="fas fa-chart-area"></i><p>No season stats added yet.</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = seasonStats.map((s, idx) => {
+    const canvasId = 'radar-' + (s.id || idx);
+    return `
+      <div class="season-card">
+        <div class="season-card-name">${escHtml(s.season || 'Season ?')}</div>
+        <div class="season-card-body">
+          <div class="season-kpms">
+            <div class="season-mode-block">
+              <div class="season-mode-label"><i class="fas fa-shield-alt"></i> A/D</div>
+              <div class="season-stat-row">
+                <span class="season-stat-key">KPM</span>
+                <span class="season-stat-val">${Number(s.adKpm || 0).toFixed(2)}</span>
+              </div>
+              <div class="season-stat-row">
+                <span class="season-stat-key">SPM</span>
+                <span class="season-stat-val">${Number(s.adSpm || 0).toFixed(1)}</span>
+              </div>
+            </div>
+            <div class="season-mode-block">
+              <div class="season-mode-label"><i class="fas fa-flag"></i> Victory Unite</div>
+              <div class="season-stat-row">
+                <span class="season-stat-key">KPM</span>
+                <span class="season-stat-val">${Number(s.vuKpm || 0).toFixed(2)}</span>
+              </div>
+              <div class="season-stat-row">
+                <span class="season-stat-key">SPM</span>
+                <span class="season-stat-val">${Number(s.vuSpm || 0).toFixed(1)}</span>
+              </div>
+            </div>
+          </div>
+          <div class="season-radar-wrap">
+            <canvas class="radar-chart" id="${canvasId}" width="220" height="220"
+              data-shooting="${Number((s.radar && s.radar.shooting)  || 0)}"
+              data-survival="${Number((s.radar && s.radar.survival)  || 0)}"
+              data-coop="${Number((s.radar && s.radar.coop)          || 0)}"
+              data-objective="${Number((s.radar && s.radar.objective)|| 0)}"
+              data-vehicle="${Number((s.radar && s.radar.vehicle)    || 0)}">
+            </canvas>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+
+  /* Draw radar charts when visible */
+  const canvases = grid.querySelectorAll('.radar-chart');
+  const radarObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        drawRadarChart(entry.target);
+        radarObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  canvases.forEach(c => radarObserver.observe(c));
+}
+
+function drawRadarChart(canvas) {
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  const w = canvas.width;
+  const h = canvas.height;
+  const cx = w / 2;
+  const cy = h / 2;
+  const maxR = Math.min(cx, cy) - 30;
+
+  const labels = ['Shooting', 'Survival', 'Co-op', 'Objective', 'Vehicle'];
+  const values = [
+    Number(canvas.dataset.shooting  || 0),
+    Number(canvas.dataset.survival  || 0),
+    Number(canvas.dataset.coop      || 0),
+    Number(canvas.dataset.objective || 0),
+    Number(canvas.dataset.vehicle   || 0)
+  ];
+  const n = labels.length;
+  const angles = labels.map((_, i) => (Math.PI * 2 * i / n) - Math.PI / 2);
+
+  const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+  const gridColor  = isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)';
+  const labelColor = isDark ? 'rgba(255,255,255,0.7)'  : 'rgba(0,0,0,0.7)';
+  const accentFill   = 'rgba(15,247,150,0.25)';
+  const accentStroke = '#0ff796';
+
+  ctx.clearRect(0, 0, w, h);
+
+  /* Grid circles */
+  [20, 40, 60, 80, 100].forEach(level => {
+    ctx.beginPath();
+    angles.forEach((ang, i) => {
+      const r = maxR * level / 100;
+      const x = cx + r * Math.cos(ang);
+      const y = cy + r * Math.sin(ang);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    });
+    ctx.closePath();
+    ctx.strokeStyle = gridColor;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  });
+
+  /* Axes */
+  angles.forEach(ang => {
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + maxR * Math.cos(ang), cy + maxR * Math.sin(ang));
+    ctx.strokeStyle = gridColor;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  });
+
+  /* Data polygon */
+  ctx.beginPath();
+  angles.forEach((ang, i) => {
+    const r = maxR * (values[i] / 100);
+    const x = cx + r * Math.cos(ang);
+    const y = cy + r * Math.sin(ang);
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  });
+  ctx.closePath();
+  ctx.fillStyle = accentFill;
+  ctx.fill();
+  ctx.strokeStyle = accentStroke;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  /* Data point dots */
+  angles.forEach((ang, i) => {
+    const r = maxR * (values[i] / 100);
+    const x = cx + r * Math.cos(ang);
+    const y = cy + r * Math.sin(ang);
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.fillStyle = accentStroke;
+    ctx.fill();
+  });
+
+  /* Labels */
+  ctx.font = 'bold 11px Inter, sans-serif';
+  ctx.fillStyle = labelColor;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  angles.forEach((ang, i) => {
+    const r = maxR + 18;
+    const x = cx + r * Math.cos(ang);
+    const y = cy + r * Math.sin(ang);
+    ctx.fillText(labels[i], x, y);
+  });
+}
+
 /* ── RENDER PROFILE ──────────────────────────────────────── */
 function renderProfile(profile) {
   const card = document.getElementById('profileCard');
   if (!card) return;
 
-  const metaItems = [
-    { icon: 'fas fa-id-badge',    val: profile.playerId  },
-    { icon: 'fas fa-globe-asia',  val: profile.region    },
-    { icon: 'fas fa-running',     val: profile.playstyle }
-  ].filter(m => m.val);
+  const p = profile || {};
+
+  /* Build photo / silhouette */
+  const photoHtml = p.displayPhoto
+    ? `<div class="profile-photo-wrap"><img class="profile-photo" src="${escHtml(p.displayPhoto)}" alt="Profile Photo" /></div>`
+    : `<div class="profile-photo-wrap"><div class="profile-shadow-placeholder"><i class="fas fa-user"></i></div></div>`;
+
+  /* Birthday */
+  const birthdayHtml = (p.birthdayDay && p.birthdayMonth)
+    ? `<div class="profile-field"><i class="fas fa-birthday-cake"></i> ${escHtml(String(p.birthdayDay))} ${escHtml(p.birthdayMonth)}</div>`
+    : '';
+
+  /* Team history */
+  const teamHistory = Array.isArray(p.teamHistory) ? p.teamHistory : [];
+  const sortedHistory = [...teamHistory].sort((a, b) => {
+    const ay = a.startYear || 0; const by = b.startYear || 0;
+    return ay !== by ? by - ay : 0;
+  });
+
+  const teamHistoryHtml = sortedHistory.length > 0 ? `
+    <div class="team-history-wrap">
+      <div class="team-history-title"><i class="fas fa-history"></i> Team History</div>
+      <div class="team-history-list">
+        ${sortedHistory.map(th => {
+          const start = `${th.startMonth || ''} ${th.startYear || ''}`.trim();
+          const end   = th.isCurrent ? 'Sekarang' : `${th.endMonth || ''} ${th.endYear || ''}`.trim();
+          const period = [start, end].filter(Boolean).join(' — ');
+          const activeBadge = th.isCurrent ? `<span class="active-badge">ACTIVE</span>` : '';
+          return `
+            <div class="team-history-item${th.isCurrent ? ' current' : ''}">
+              <div class="th-team-name">${escHtml(th.teamName || '—')} ${activeBadge}</div>
+              <div class="th-period">${escHtml(period)}</div>
+              <div class="th-ign"><i class="fas fa-id-badge"></i> ${escHtml(th.ign || '—')}</div>
+            </div>`;
+        }).join('')}
+      </div>
+    </div>` : '';
 
   card.innerHTML = `
-    <div class="profile-avatar"><i class="fas fa-user-astronaut"></i></div>
-    <div class="profile-nickname">${escHtml(profile.nickname || 'Unknown Player')}</div>
-    ${profile.rank ? `<div class="profile-rank-badge"><i class="fas fa-star"></i> ${escHtml(profile.rank)}</div>` : ''}
-    <div class="profile-meta">
-      ${metaItems.map(m => `
-        <span class="profile-meta-item">
-          <i class="${m.icon}"></i> ${escHtml(m.val)}
-        </span>
-      `).join('')}
+    ${photoHtml}
+    <div class="profile-nickname">${escHtml(p.currentIGN || p.nickname || 'Unknown Player')}</div>
+    ${p.currentTeam ? `<div class="profile-team"><i class="fas fa-users"></i> ${escHtml(p.currentTeam)}</div>` : ''}
+    ${p.rank ? `<div class="profile-rank-badge"><i class="fas fa-star"></i> ${escHtml(p.rank)}</div>` : ''}
+    <div class="profile-fields">
+      ${birthdayHtml}
+      ${p.birthplace ? `<div class="profile-field"><i class="fas fa-map-marker-alt"></i> ${escHtml(p.birthplace)}</div>` : ''}
+      ${p.region     ? `<div class="profile-field"><i class="fas fa-globe-asia"></i> ${escHtml(p.region)}</div>` : ''}
+      ${p.playstyle  ? `<div class="profile-field"><i class="fas fa-running"></i> ${escHtml(p.playstyle)}</div>` : ''}
+      ${p.playerId   ? `<div class="profile-field"><i class="fas fa-id-card"></i> ${escHtml(p.playerId)}</div>` : ''}
     </div>
-    ${profile.bio ? `<div class="profile-bio">${escHtml(profile.bio)}</div>` : ''}
+    ${p.bio ? `<div class="profile-bio">"${escHtml(p.bio)}"</div>` : ''}
+    ${teamHistoryHtml}
   `;
 }
 
 /* ── SCROLL ANIMATIONS ───────────────────────────────────── */
 function initScrollAnimations() {
   const targets = document.querySelectorAll(
-    '.loadout-card, .featured-loadout-card, .achievement-card, .setting-card, .stat-bar-item, .spec-item'
+    '.loadout-card, .featured-loadout-card, .achievement-card, .setting-card, .stat-bar-item, .spec-item, .clip-card, .testimonial-card, .season-card'
   );
 
   const observer = new IntersectionObserver(entries => {
@@ -560,8 +987,11 @@ document.addEventListener('DOMContentLoaded', () => {
     renderLoadouts(data.loadouts);
     renderSettings(data.settings);
     renderAchievements(data.achievements);
+    renderClips(data.clips);
+    renderTestimonials(data.testimonials);
     renderPcSpecs(data.pcSpecs);
     renderStats(data.stats);
+    renderSeasonStats(data.seasonStats);
     renderProfile(data.profile);
     initLightbox();
     initNavScroll();

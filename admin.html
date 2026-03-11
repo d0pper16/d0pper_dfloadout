@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Panel | GUNSMITH DELTAFORCE by D0PPER.</title>
+  <title>Admin Panel | D0PPER.</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -18,7 +18,7 @@
     <div class="login-box">
       <div class="login-logo">
         <span class="brand-icon">⬡</span>
-        <h2>GUNSMITH DELTAFORCE by D0PPER.</h2>
+        <h2>D0PPER.</h2>
         <p>ADMIN ACCESS</p>
       </div>
       <form class="login-form" id="loginForm">
@@ -42,7 +42,7 @@
       <div class="nav-container">
         <a href="index.html" class="nav-brand">
           <span class="brand-icon">⬡</span>
-          <span class="brand-text">GUNSMITH DELTAFORCE by D0PPER.</span>
+          <span class="brand-text">D0PPER.</span>
           <span class="admin-badge">ADMIN</span>
         </a>
         <div class="nav-actions">
@@ -74,8 +74,20 @@
           <li><a href="#" class="admin-nav-link" data-section="achievements">
             <i class="fas fa-trophy"></i> Achievements
           </a></li>
+          <li><a href="#" class="admin-nav-link" data-section="clips">
+            <i class="fas fa-film"></i> Clips
+          </a></li>
+          <li><a href="#" class="admin-nav-link" data-section="testimonials">
+            <i class="fas fa-comment-dots"></i> Testimonials
+          </a></li>
           <li><a href="#" class="admin-nav-link" data-section="pcspecs">
             <i class="fas fa-desktop"></i> PC Specs
+          </a></li>
+          <li><a href="#" class="admin-nav-link" data-section="stats">
+            <i class="fas fa-chart-bar"></i> Skill Stats
+          </a></li>
+          <li><a href="#" class="admin-nav-link" data-section="seasons">
+            <i class="fas fa-chart-area"></i> Season Stats
           </a></li>
           <li><a href="#" class="admin-nav-link" data-section="profile">
             <i class="fas fa-user"></i> Profile
@@ -83,8 +95,8 @@
           <li><a href="#" class="admin-nav-link" data-section="social">
             <i class="fas fa-share-alt"></i> Social Links
           </a></li>
-          <li><a href="#" class="admin-nav-link" data-section="stats">
-            <i class="fas fa-chart-bar"></i> Player Stats
+          <li><a href="#" class="admin-nav-link" data-section="visitor">
+            <i class="fas fa-eye"></i> Visitor Counter
           </a></li>
         </ul>
       </aside>
@@ -100,40 +112,63 @@
 
           <!-- Add/Edit Form -->
           <div class="admin-card">
-            <h3 id="loadoutFormTitle">Add New Loadout</h3>
+            <h3 id="loadoutFormTitle">Add New Weapon</h3>
             <form id="loadoutForm">
               <input type="hidden" id="loadoutId" />
               <div class="form-row">
                 <div class="form-group">
-                  <label for="loadoutTitle">Loadout Title</label>
-                  <input type="text" id="loadoutTitle" placeholder="e.g. M4A1 CQB Build" required />
+                  <label for="loadoutWeaponName">Weapon Name <span class="required">*</span></label>
+                  <input type="text" id="loadoutWeaponName" placeholder="e.g. M4A1, AWM, CI-19" required />
                 </div>
-              </div>
-              <div class="form-group">
-                <label for="loadoutCode">Weapon Code</label>
-                <textarea id="loadoutCode" rows="3" placeholder="Paste weapon code here..." required></textarea>
-              </div>
-              <div class="form-row">
                 <div class="form-group">
                   <label for="loadoutCategory">Category</label>
-                  <input type="text" id="loadoutCategory" list="categoryList" placeholder="e.g. Assault, Sniper..." />
-                  <datalist id="categoryList">
-                    <option value="Assault" /><option value="Sniper" /><option value="SMG" />
-                    <option value="LMG" /><option value="Support" /><option value="Shotgun" />
-                  </datalist>
-                </div>
-                <div class="form-group form-group-center">
-                  <label>Featured</label>
-                  <label class="toggle-label">
-                    <input type="checkbox" id="loadoutFeatured" />
-                    <span class="toggle-switch"></span>
-                    <span class="toggle-text">Mark as Featured Loadout</span>
-                  </label>
+                  <select id="loadoutCategory">
+                    <option value="">-- Select Category --</option>
+                    <option value="Assault Rifle">Assault Rifle</option>
+                    <option value="SMG">SMG</option>
+                    <option value="Sniper">Sniper</option>
+                    <option value="LMG">LMG</option>
+                    <option value="Marksman">Marksman</option>
+                    <option value="Shotgun">Shotgun</option>
+                    <option value="Pistol">Pistol</option>
+                    <option value="Other">Other</option>
+                  </select>
                 </div>
               </div>
+              <div class="form-group form-group-center">
+                <label>Favorite</label>
+                <label class="toggle-label">
+                  <input type="checkbox" id="loadoutFavorite" />
+                  <span class="toggle-switch"></span>
+                  <span class="toggle-text">Mark as Favorite Weapon ⭐</span>
+                </label>
+              </div>
+
+              <!-- Builds Section -->
+              <div class="builds-section">
+                <div class="builds-section-header">
+                  <label>Builds <span style="color:var(--text-muted);font-weight:normal;">(optional, max 5)</span></label>
+                  <button type="button" class="btn btn-outline btn-sm" id="addBuildBtn">
+                    <i class="fas fa-plus"></i> Add Build
+                  </button>
+                </div>
+                <div id="buildsContainer">
+                  <!-- Build rows added dynamically -->
+                </div>
+              </div>
+              <!-- Build type preset list (shared) -->
+              <datalist id="buildTypeList">
+                <option value="Build Stability">
+                <option value="Build Handling">
+                <option value="Build Close Range">
+                <option value="Build Long Range">
+                <option value="Build All-Rounder">
+                <option value="Build Quickscope">
+              </datalist>
+
               <div class="form-actions">
                 <button type="submit" class="btn btn-primary">
-                  <i class="fas fa-save"></i> <span id="loadoutSubmitText">Add Loadout</span>
+                  <i class="fas fa-save"></i> <span id="loadoutSubmitText">Add Weapon</span>
                 </button>
                 <button type="button" class="btn btn-outline" id="loadoutCancelBtn" style="display:none">
                   <i class="fas fa-times"></i> Cancel
@@ -144,7 +179,7 @@
 
           <!-- Loadout List -->
           <div class="admin-card">
-            <h3>Existing Loadouts</h3>
+            <h3>Existing Weapons</h3>
             <div id="loadoutList" class="admin-list">
               <!-- Filled by JS -->
             </div>
@@ -283,6 +318,84 @@
           </div>
         </div>
 
+        <!-- CLIPS SECTION -->
+        <div class="admin-section" id="section-clips">
+          <div class="admin-section-header">
+            <h2><i class="fas fa-film"></i> Gameplay Clips</h2>
+          </div>
+
+          <div class="admin-card">
+            <h3 id="clipFormTitle">Add New Clip</h3>
+            <form id="clipForm">
+              <input type="hidden" id="clipId" />
+              <div class="form-group">
+                <label for="clipTitle">Clip Title</label>
+                <input type="text" id="clipTitle" placeholder="e.g. Epic Squad Wipe" required />
+              </div>
+              <div class="form-group">
+                <label for="clipUrl">YouTube / TikTok URL</label>
+                <input type="url" id="clipUrl" placeholder="https://youtube.com/watch?v=... or https://tiktok.com/..." required />
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-save"></i> <span id="clipSubmitText">Add Clip</span>
+                </button>
+                <button type="button" class="btn btn-outline" id="clipCancelBtn" style="display:none">
+                  <i class="fas fa-times"></i> Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div class="admin-card">
+            <h3>Existing Clips</h3>
+            <div id="clipList" class="admin-list"><!-- Filled by JS --></div>
+          </div>
+        </div>
+
+        <!-- TESTIMONIALS SECTION -->
+        <div class="admin-section" id="section-testimonials">
+          <div class="admin-section-header">
+            <h2><i class="fas fa-comment-dots"></i> Testimonials</h2>
+          </div>
+
+          <div class="admin-card">
+            <h3 id="testimonialFormTitle">Add New Testimonial</h3>
+            <form id="testimonialForm">
+              <input type="hidden" id="testimonialId" />
+              <div class="form-group">
+                <label for="testimonialName">Sender Name <span class="required">*</span></label>
+                <input type="text" id="testimonialName" placeholder="Full name of sender" required />
+              </div>
+              <div class="form-group">
+                <label for="testimonialMessage">Message <span class="required">*</span></label>
+                <textarea id="testimonialMessage" rows="3" placeholder="Write the testimonial message..." required></textarea>
+              </div>
+              <div class="form-group form-group-center">
+                <label>Censor Name on Public Site</label>
+                <label class="toggle-label">
+                  <input type="checkbox" id="testimonialCensor" />
+                  <span class="toggle-switch"></span>
+                  <span class="toggle-text">Censor sender name (e.g. J**n D*e)</span>
+                </label>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-save"></i> <span id="testimonialSubmitText">Add Testimonial</span>
+                </button>
+                <button type="button" class="btn btn-outline" id="testimonialCancelBtn" style="display:none">
+                  <i class="fas fa-times"></i> Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div class="admin-card">
+            <h3>Existing Testimonials</h3>
+            <div id="testimonialList" class="admin-list"><!-- Filled by JS --></div>
+          </div>
+        </div>
+
         <!-- PC SPECS SECTION -->
         <div class="admin-section" id="section-pcspecs">
           <div class="admin-section-header">
@@ -335,6 +448,110 @@
           </div>
         </div>
 
+        <!-- SKILL STATS SECTION -->
+        <div class="admin-section" id="section-stats">
+          <div class="admin-section-header">
+            <h2><i class="fas fa-chart-bar"></i> Skill Stats</h2>
+          </div>
+          <div class="admin-card">
+            <p style="font-size:.875rem;color:var(--text-muted);margin-bottom:1.25rem;">Edit stat values (0–100). Each stat gets an animated bar on the public site.</p>
+            <form id="statsForm">
+              <div id="statsFormFields"><!-- Filled by JS --></div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Stats</button>
+                <button type="button" class="btn btn-outline" id="addStatBtn"><i class="fas fa-plus"></i> Add Stat</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- SEASON STATS SECTION -->
+        <div class="admin-section" id="section-seasons">
+          <div class="admin-section-header">
+            <h2><i class="fas fa-chart-area"></i> Season Stats</h2>
+          </div>
+
+          <div class="admin-card">
+            <h3 id="seasonFormTitle">Add New Season</h3>
+            <form id="seasonForm">
+              <input type="hidden" id="seasonId" />
+              <div class="form-group">
+                <label for="seasonName">Season Name <span class="required">*</span></label>
+                <input type="text" id="seasonName" placeholder="e.g. Season 1, Season Alpha..." required />
+              </div>
+
+              <div class="season-stats-form-grid">
+                <div class="season-mode-block">
+                  <div class="season-mode-label"><i class="fas fa-shield-alt"></i> A/D (Attack &amp; Defense)</div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="adKpm" class="label-sm">KPM (Kill/Min)</label>
+                      <input type="number" id="adKpm" step="0.01" min="0" placeholder="e.g. 2.50" />
+                    </div>
+                    <div class="form-group">
+                      <label for="adSpm" class="label-sm">SPM (Score/Min)</label>
+                      <input type="number" id="adSpm" step="0.1" min="0" placeholder="e.g. 350" />
+                    </div>
+                  </div>
+                </div>
+                <div class="season-mode-block">
+                  <div class="season-mode-label"><i class="fas fa-flag"></i> Victory Unite</div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="vuKpm" class="label-sm">KPM (Kill/Min)</label>
+                      <input type="number" id="vuKpm" step="0.01" min="0" placeholder="e.g. 1.80" />
+                    </div>
+                    <div class="form-group">
+                      <label for="vuSpm" class="label-sm">SPM (Score/Min)</label>
+                      <input type="number" id="vuSpm" step="0.1" min="0" placeholder="e.g. 280" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="season-radar-block">
+                <div class="season-mode-label"><i class="fas fa-spider"></i> Radar Chart (0–100)</div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="radarShooting" class="label-sm">Shooting</label>
+                    <input type="number" id="radarShooting" min="0" max="100" placeholder="0-100" />
+                  </div>
+                  <div class="form-group">
+                    <label for="radarSurvival" class="label-sm">Survival</label>
+                    <input type="number" id="radarSurvival" min="0" max="100" placeholder="0-100" />
+                  </div>
+                  <div class="form-group">
+                    <label for="radarCoop" class="label-sm">Co-op</label>
+                    <input type="number" id="radarCoop" min="0" max="100" placeholder="0-100" />
+                  </div>
+                  <div class="form-group">
+                    <label for="radarObjective" class="label-sm">Objective</label>
+                    <input type="number" id="radarObjective" min="0" max="100" placeholder="0-100" />
+                  </div>
+                  <div class="form-group">
+                    <label for="radarVehicle" class="label-sm">Vehicle</label>
+                    <input type="number" id="radarVehicle" min="0" max="100" placeholder="0-100" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-save"></i> <span id="seasonSubmitText">Add Season</span>
+                </button>
+                <button type="button" class="btn btn-outline" id="seasonCancelBtn" style="display:none">
+                  <i class="fas fa-times"></i> Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div class="admin-card">
+            <h3>Existing Seasons</h3>
+            <div id="seasonList" class="admin-list"><!-- Filled by JS --></div>
+          </div>
+        </div>
+
         <!-- PROFILE SECTION -->
         <div class="admin-section" id="section-profile">
           <div class="admin-section-header">
@@ -344,27 +561,76 @@
             <form id="profileForm">
               <div class="form-row">
                 <div class="form-group">
-                  <label for="profileNickname">Nickname / In-Game Name</label>
-                  <input type="text" id="profileNickname" placeholder="e.g. d0pper" />
+                  <label for="profileCurrentIGN">Current IGN (In-Game Name)</label>
+                  <input type="text" id="profileCurrentIGN" placeholder="e.g. d0pper" />
                 </div>
                 <div class="form-group">
-                  <label for="profilePlayerId">Player ID</label>
-                  <input type="text" id="profilePlayerId" placeholder="e.g. DF-123456" />
+                  <label for="profileCurrentTeam">Current Team</label>
+                  <input type="text" id="profileCurrentTeam" placeholder="e.g. Team Alpha" />
                 </div>
               </div>
               <div class="form-row">
                 <div class="form-group">
+                  <label for="profileBirthplace">Birthplace</label>
+                  <input type="text" id="profileBirthplace" placeholder="e.g. Jakarta, Bandung" />
+                </div>
+                <div class="form-group">
+                  <label>Birthday (Day &amp; Month only)</label>
+                  <div class="form-row">
+                    <div class="form-group" style="max-width:100px;">
+                      <label for="profileBirthdayDay" class="label-sm">Day</label>
+                      <input type="number" id="profileBirthdayDay" min="1" max="31" placeholder="e.g. 15" />
+                    </div>
+                    <div class="form-group">
+                      <label for="profileBirthdayMonth" class="label-sm">Month</label>
+                      <select id="profileBirthdayMonth">
+                        <option value="">-- Month --</option>
+                        <option value="Januari">Januari</option>
+                        <option value="Februari">Februari</option>
+                        <option value="Maret">Maret</option>
+                        <option value="April">April</option>
+                        <option value="Mei">Mei</option>
+                        <option value="Juni">Juni</option>
+                        <option value="Juli">Juli</option>
+                        <option value="Agustus">Agustus</option>
+                        <option value="September">September</option>
+                        <option value="Oktober">Oktober</option>
+                        <option value="November">November</option>
+                        <option value="Desember">Desember</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Display Photo</label>
+                <input type="file" id="profilePhoto" accept="image/*" class="file-input" />
+                <div class="photo-preview-row" id="profilePhotoPreview"></div>
+                <button type="button" class="btn btn-outline btn-sm" id="profilePhotoRemoveBtn" style="display:none;margin-top:.5rem;">
+                  <i class="fas fa-trash"></i> Remove Photo
+                </button>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
                   <label for="profileRank">Rank</label>
-                  <input type="text" id="profileRank" placeholder="e.g. Elite IV" />
+                  <input type="text" id="profileRank" placeholder="e.g. Diamond" />
                 </div>
                 <div class="form-group">
                   <label for="profileRegion">Region / Server</label>
-                  <input type="text" id="profileRegion" placeholder="e.g. SEA" />
+                  <input type="text" id="profileRegion" placeholder="e.g. Asia, SEA" />
                 </div>
               </div>
-              <div class="form-group">
-                <label for="profilePlaystyle">Playstyle</label>
-                <input type="text" id="profilePlaystyle" placeholder="e.g. Aggressive Assault" />
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="profilePlayerId">Player ID</label>
+                  <input type="text" id="profilePlayerId" placeholder="e.g. DF-123456" />
+                </div>
+                <div class="form-group">
+                  <label for="profilePlaystyle">Playstyle</label>
+                  <input type="text" id="profilePlaystyle" placeholder="e.g. Aggressive Assault" />
+                </div>
               </div>
               <div class="form-group">
                 <label for="profileBio">Bio</label>
@@ -376,6 +642,93 @@
                 </button>
               </div>
             </form>
+          </div>
+
+          <!-- TEAM HISTORY SUB-SECTION -->
+          <div class="admin-card" id="teamHistorySection">
+            <h3><i class="fas fa-history"></i> Team History</h3>
+            <div class="admin-card" style="background:var(--bg-secondary);margin-bottom:1rem;">
+              <h4 id="teamHistoryFormTitle" style="margin-bottom:1rem;font-size:1rem;">Add Team History Entry</h4>
+              <form id="teamHistoryForm">
+                <input type="hidden" id="teamHistoryId" />
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="thTeamName">Team Name <span class="required">*</span></label>
+                    <input type="text" id="thTeamName" placeholder="e.g. Team Alpha, RNG Esports" required />
+                  </div>
+                  <div class="form-group">
+                    <label for="thIgn">IGN During This Period <span class="required">*</span></label>
+                    <input type="text" id="thIgn" placeholder="e.g. d0pper, noob_d0pper" required />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="label-sm">Start</label>
+                    <div class="form-row">
+                      <div class="form-group">
+                        <select id="thStartMonth">
+                          <option value="">Month</option>
+                          <option value="Januari">Januari</option>
+                          <option value="Februari">Februari</option>
+                          <option value="Maret">Maret</option>
+                          <option value="April">April</option>
+                          <option value="Mei">Mei</option>
+                          <option value="Juni">Juni</option>
+                          <option value="Juli">Juli</option>
+                          <option value="Agustus">Agustus</option>
+                          <option value="September">September</option>
+                          <option value="Oktober">Oktober</option>
+                          <option value="November">November</option>
+                          <option value="Desember">Desember</option>
+                        </select>
+                      </div>
+                      <div class="form-group" style="max-width:100px;">
+                        <input type="number" id="thStartYear" placeholder="Year" min="2000" max="2099" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="label-sm">End</label>
+                    <div class="form-row">
+                      <div class="form-group">
+                        <select id="thEndMonth">
+                          <option value="">Month</option>
+                          <option value="Januari">Januari</option>
+                          <option value="Februari">Februari</option>
+                          <option value="Maret">Maret</option>
+                          <option value="April">April</option>
+                          <option value="Mei">Mei</option>
+                          <option value="Juni">Juni</option>
+                          <option value="Juli">Juli</option>
+                          <option value="Agustus">Agustus</option>
+                          <option value="September">September</option>
+                          <option value="Oktober">Oktober</option>
+                          <option value="November">November</option>
+                          <option value="Desember">Desember</option>
+                        </select>
+                      </div>
+                      <div class="form-group" style="max-width:100px;">
+                        <input type="number" id="thEndYear" placeholder="Year" min="2000" max="2099" />
+                      </div>
+                    </div>
+                    <label class="toggle-label" style="margin-top:.5rem;">
+                      <input type="checkbox" id="thIsCurrent" />
+                      <span class="toggle-switch"></span>
+                      <span class="toggle-text">Still Active (Sekarang)</span>
+                    </label>
+                  </div>
+                </div>
+                <div class="form-actions">
+                  <button type="submit" class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus"></i> <span id="thSubmitText">Add Entry</span>
+                  </button>
+                  <button type="button" class="btn btn-outline btn-sm" id="thCancelBtn" style="display:none">
+                    <i class="fas fa-times"></i> Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+            <div id="teamHistoryList" class="admin-list"><!-- Filled by JS --></div>
           </div>
         </div>
 
@@ -415,18 +768,42 @@
           </div>
         </div>
 
-        <!-- PLAYER STATS SECTION -->
-        <div class="admin-section" id="section-stats">
+        <!-- VISITOR COUNTER SECTION -->
+        <div class="admin-section" id="section-visitor">
           <div class="admin-section-header">
-            <h2><i class="fas fa-chart-bar"></i> Player Stats</h2>
+            <h2><i class="fas fa-eye"></i> Visitor Counter</h2>
           </div>
           <div class="admin-card">
-            <p style="font-size:.875rem;color:var(--text-muted);margin-bottom:1.25rem;">Edit stat values (0–100). Each stat gets an animated bar on the public site.</p>
-            <form id="statsForm">
-              <div id="statsFormFields"><!-- Filled by JS --></div>
+            <p style="font-size:.875rem;color:var(--text-muted);margin-bottom:1.25rem;">
+              Set a base visitor count. Real visits are added on top of this number.
+              <br><strong>Displayed Count = Base Count + Real Visits</strong>
+            </p>
+            <form id="visitorForm">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="visitorBaseCount">Base Count</label>
+                  <input type="number" id="visitorBaseCount" min="0" placeholder="e.g. 1000" />
+                </div>
+                <div class="form-group">
+                  <label>Real Visits</label>
+                  <div style="padding:.75rem 0;font-size:1.1rem;font-weight:600;color:var(--accent);">
+                    <span id="visitorRealCount">0</span> real visits
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Total Displayed</label>
+                  <div style="padding:.75rem 0;font-size:1.25rem;font-weight:700;color:var(--accent);">
+                    <i class="fas fa-eye"></i> <span id="visitorTotalDisplay">0</span>
+                  </div>
+                </div>
+              </div>
               <div class="form-actions">
-                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Stats</button>
-                <button type="button" class="btn btn-outline" id="addStatBtn"><i class="fas fa-plus"></i> Add Stat</button>
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-save"></i> Save Base Count
+                </button>
+                <button type="button" class="btn btn-outline btn-danger-outline" id="resetVisitorBtn">
+                  <i class="fas fa-redo"></i> Reset Real Visits
+                </button>
               </div>
             </form>
           </div>

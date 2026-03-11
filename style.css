@@ -1290,3 +1290,553 @@ ul { list-style: none; }
   .toast { left: 1rem; right: 1rem; text-align: center; justify-content: center; }
   .hero-title { font-size: 1.6rem; }
 }
+
+/* ── LOADOUT SEARCH BAR ──────────────────────────────────── */
+.loadout-search-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+.loadout-search-box {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 1rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  pointer-events: none;
+}
+
+.loadout-search-input {
+  width: 100%;
+  padding: 0.7rem 2.8rem 0.7rem 2.6rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+
+.loadout-search-input:focus {
+  border-color: var(--accent2);
+  box-shadow: 0 0 0 3px rgba(15, 247, 150, 0.12);
+}
+
+.loadout-search-input::placeholder { color: var(--text-muted); }
+
+.search-clear-btn {
+  position: absolute;
+  right: 0.6rem;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: color 0.2s;
+}
+
+.search-clear-btn:hover { color: var(--accent); }
+
+.loadout-no-results {
+  width: 100%;
+}
+
+/* ── BUILD LIST (in loadout card) ────────────────────────── */
+.builds-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.build-item {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+}
+
+.build-type-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.35rem;
+}
+
+.build-code {
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  color: var(--accent);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 0.45rem 0.65rem;
+  word-break: break-all;
+  margin-bottom: 0.5rem;
+}
+
+.build-empty {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  padding: 0.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* ── PROFILE — PHOTO / SHADOW PLACEHOLDER ────────────────── */
+.profile-photo-wrap {
+  margin: 0 auto 1.5rem;
+  width: 120px;
+  height: 120px;
+}
+
+.profile-photo {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--accent2);
+  box-shadow: 0 0 20px rgba(15, 247, 150, 0.35);
+}
+
+.profile-shadow-placeholder {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 60%, #1a2e1a 0%, #0a0e0a 100%);
+  border: 3px solid var(--accent2);
+  box-shadow: 0 0 20px rgba(15, 247, 150, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.8rem;
+  color: rgba(15, 247, 150, 0.35);
+}
+
+[data-theme="light"] .profile-shadow-placeholder {
+  background: radial-gradient(ellipse at 50% 60%, #c0d4b8 0%, #a8c0a0 100%);
+  color: rgba(10, 168, 90, 0.45);
+}
+
+.profile-team {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--accent2-light);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.profile-fields {
+  display: flex;
+  gap: 0.5rem 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 0.75rem 0 1rem;
+}
+
+.profile-field {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.profile-field i { color: var(--accent2-light); }
+
+/* ── TEAM HISTORY ────────────────────────────────────────── */
+.team-history-wrap {
+  margin-top: 2rem;
+  text-align: left;
+  border-top: 1px solid var(--border-color);
+  padding-top: 1.5rem;
+}
+
+.team-history-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.team-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.team-history-item {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-left: 3px solid var(--border-color);
+  border-radius: 0 8px 8px 0;
+  padding: 0.85rem 1rem;
+  transition: border-color 0.2s;
+}
+
+.team-history-item.current {
+  border-left-color: var(--accent2);
+  background: rgba(15, 247, 150, 0.04);
+}
+
+.th-team-name {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.th-period {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 0.2rem;
+}
+
+.th-ign {
+  font-size: 0.8rem;
+  color: var(--accent2-light);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.active-badge {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  background: rgba(15, 247, 150, 0.15);
+  border: 1px solid var(--accent2);
+  color: var(--accent2-light);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+
+/* ── CLIPS SECTION ───────────────────────────────────────── */
+.clips-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 1.5rem;
+}
+
+.clip-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 1rem;
+  transition: opacity 0.5s ease, transform 0.5s ease, border-color 0.2s;
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+.clip-card.animate-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.clip-card:hover { border-color: var(--accent); }
+
+.clip-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.75rem;
+}
+
+.clip-embed-wrap {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 */
+  background: var(--bg-primary);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.clip-embed-wrap iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 6px;
+}
+
+/* ── TESTIMONIALS ────────────────────────────────────────── */
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.testimonial-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 1.5rem;
+  position: relative;
+  transition: opacity 0.5s ease, transform 0.5s ease, border-color 0.2s;
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+.testimonial-card.animate-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.testimonial-card::before {
+  content: '"';
+  position: absolute;
+  top: 0.5rem;
+  left: 1rem;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 4rem;
+  line-height: 1;
+  color: var(--accent2);
+  opacity: 0.18;
+  pointer-events: none;
+}
+
+.testimonial-card:hover { border-color: var(--accent2); }
+
+.testimonial-message {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  font-style: italic;
+  margin-bottom: 1rem;
+}
+
+.testimonial-sender {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--accent2-light);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* ── SEASON STATS ────────────────────────────────────────── */
+.season-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 1.5rem;
+}
+
+.season-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 1.5rem;
+  transition: opacity 0.5s ease, transform 0.5s ease, border-color 0.2s;
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+.season-card.animate-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.season-card:hover { border-color: var(--accent2); }
+
+.season-card-name {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+.season-card-body {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.season-kpms {
+  flex: 1;
+  min-width: 160px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.season-mode-block {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.75rem;
+}
+
+.season-mode-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.season-stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.2rem;
+}
+
+.season-stat-key {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.season-stat-val {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent2-light);
+}
+
+.season-radar-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.radar-chart {
+  display: block;
+  max-width: 220px;
+  max-height: 220px;
+}
+
+/* ── ADMIN — NEW STYLES ──────────────────────────────────── */
+.builds-section {
+  margin: 1rem 0;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem;
+  background: var(--bg-secondary);
+}
+
+.builds-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.builds-section-header label {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.build-row {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.build-row-inner { margin-bottom: 0; }
+
+.season-stats-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 0.5rem 0;
+}
+
+.season-radar-block {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 0.5rem 0;
+}
+
+.required {
+  color: var(--danger);
+  font-size: 0.85rem;
+}
+
+.btn-danger-outline {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.btn-danger-outline:hover {
+  background: rgba(192, 57, 43, 0.12);
+}
+
+/* ── RESPONSIVE — NEW COMPONENTS ────────────────────────── */
+@media (max-width: 768px) {
+  .clips-grid,
+  .testimonials-grid,
+  .season-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .season-card-body { flex-direction: column; }
+
+  .season-radar-wrap { width: 100%; justify-content: center; }
+
+  .season-stats-form-grid { grid-template-columns: 1fr; }
+
+  .profile-photo-wrap { width: 100px; height: 100px; }
+  .profile-photo, .profile-shadow-placeholder { width: 100px; height: 100px; }
+}
