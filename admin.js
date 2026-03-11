@@ -614,6 +614,405 @@ function initStatsManager() {
   loadStats();
 }
 
+/* ── SEASON STATS MANAGEMENT ─────────────────────────────── */
+function initSeasonStatsManager() {
+  const form      = document.getElementById('seasonForm');
+  const cancelBtn = document.getElementById('seasonCancelBtn');
+  const idField   = document.getElementById('seasonId');
+  const previewCanvas = document.getElementById('adminRadarPreview');
+  if (!form) return;
+
+  function getRadarValues() {
+    return {
+      shooting:  Math.min(100, Math.max(0, parseInt(document.getElementById('radarShooting').value,  10) || 0)),
+      survival:  Math.min(100, Math.max(0, parseInt(document.getElementById('radarSurvival').value,  10) || 0)),
+      coop:      Math.min(100, Math.max(0, parseInt(document.getElementById('radarCoop').value,      10) || 0)),
+      objective: Math.min(100, Math.max(0, parseInt(document.getElementById('radarObjective').value, 10) || 0)),
+      vehicle:   Math.min(100, Math.max(0, parseInt(document.getElementById('radarVehicle').value,   10) || 0))
+    };
+  }
+
+  function updatePreview() {
+    if (previewCanvas && window.dfApp && window.dfApp.drawRadarChart) {
+      window.dfApp.drawRadarChart(previewCanvas, getRadarValues());
+    }
+  }
+
+  /* Live preview on input change */
+  document.querySelectorAll('.radar-input').forEach(inp => {
+    inp.addEventListener('input', updatePreview);
+  });
+  updatePreview();
+
+  function renderList() {
+    const seasons = window.dfApp.getData('seasonStats') || window.dfApp.DEFAULT_DATA.seasonStats;
+    const list    = document.getElementById('seasonList');
+    if (!list) return;
+
+    if (!seasons || seasons.length === 0) {
+      list.innerHTML = '<p style="color:var(--text-muted);font-size:.9rem;text-align:center;padding:1rem;">No seasons yet. Add one above.</p>';
+      return;
+    }
+
+    list.innerHTML = seasons.map(s => `
+      <div class="admin-list-item" data-id="${s.id}">
+        <div class="admin-list-item-info">
+          <div class="admin-list-item-title">${window.dfApp.escHtml(s.seasonName)}</div>
+          <div class="admin-list-item-meta">
+            A/D: KPM ${s.adStats?.kpm ?? '—'} · SPM ${s.adStats?.spm ?? '—'} &nbsp;|&nbsp;
+            VU: KPM ${s.victoryUnite?.kpm ?? '—'} · SPM ${s.victoryUnite?.spm ?? '—'}
+          </div>
+        </div>
+        <div class="admin-list-item-actions">
+          <button class="btn btn-outline btn-sm edit-season-btn" data-id="${s.id}">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button class="btn btn-danger btn-sm delete-season-btn" data-id="${s.id}">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </div>
+    `).join('');
+
+    list.querySelectorAll('.edit-season-btn').forEach(btn => {
+      btn.addEventListener('click', () => editSeason(btn.dataset.id));
+    });
+    list.querySelectorAll('.delete-season-btn').forEach(btn => {
+      btn.addEventListener('click', () => deleteSeason(btn.dataset.id));
+    });
+  }
+
+  function resetForm() {
+    form.reset();
+    idField.value = '';
+    document.getElementById('seasonFormTitle').textContent  = 'Add New Season';
+    document.getElementById('seasonSubmitText').textContent = 'Add Season';
+    cancelBtn.style.display = 'none';
+    ['radarShooting','radarSurvival','radarCoop','radarObjective','radarVehicle'].forEach(id => {
+      document.getElementById(id).value = 50;
+    });
+    updatePreview();
+  }
+
+  function editSeason(id) {
+    const seasons = window.dfApp.getData('seasonStats') || window.dfApp.DEFAULT_DATA.seasonStats;
+    const item = seasons.find(s => s.id === id);
+    if (!item) return;
+
+    idField.value = id;
+    document.getElementById('seasonName').value  = item.seasonName || '';
+    document.getElementById('adKpm').value       = item.adStats      ? item.adStats.kpm      : '';
+    document.getElementById('adSpm').value       = item.adStats      ? item.adStats.spm      : '';
+    document.getElementById('vuKpm').value       = item.victoryUnite ? item.victoryUnite.kpm  : '';
+    document.getElementById('vuSpm').value       = item.victoryUnite ? item.victoryUnite.spm  : '';
+    const r = item.radarChart || {};
+    document.getElementById('radarShooting').value  = r.shooting  || 0;
+    document.getElementById('radarSurvival').value  = r.survival  || 0;
+    document.getElementById('radarCoop').value      = r.coop      || 0;
+    document.getElementById('radarObjective').value = r.objective || 0;
+    document.getElementById('radarVehicle').value   = r.vehicle   || 0;
+    updatePreview();
+    document.getElementById('seasonFormTitle').textContent  = 'Edit Season';
+    document.getElementById('seasonSubmitText').textContent = 'Update Season';
+    cancelBtn.style.display = 'inline-flex';
+    document.getElementById('section-seasonStats').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function deleteSeason(id) {
+    if (!confirm('Delete this season? This action cannot be undone.')) return;
+    let seasons = window.dfApp.getData('seasonStats') || window.dfApp.DEFAULT_DATA.seasonStats;
+    seasons = seasons.filter(s => s.id !== id);
+    saveData('seasonStats', seasons);
+    renderList();
+    showAdminToast('Season deleted.');
+  }
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const seasonName  = document.getElementById('seasonName').value.trim();
+    if (!seasonName) return;
+
+    const entry = {
+      seasonName,
+      adStats: {
+        kpm: parseFloat(document.getElementById('adKpm').value) || 0,
+        spm: parseFloat(document.getElementById('adSpm').value) || 0
+      },
+      victoryUnite: {
+        kpm: parseFloat(document.getElementById('vuKpm').value) || 0,
+        spm: parseFloat(document.getElementById('vuSpm').value) || 0
+      },
+      radarChart: getRadarValues()
+    };
+
+    let seasons  = window.dfApp.getData('seasonStats') || window.dfApp.DEFAULT_DATA.seasonStats;
+    const existingId = idField.value;
+
+    if (existingId) {
+      seasons = seasons.map(s => s.id === existingId ? { ...s, ...entry } : s);
+      showAdminToast('Season updated successfully!');
+    } else {
+      seasons.push({ id: generateId(), ...entry });
+      showAdminToast('Season added successfully!');
+    }
+
+    saveData('seasonStats', seasons);
+    renderList();
+    resetForm();
+  });
+
+  cancelBtn.addEventListener('click', resetForm);
+  renderList();
+}
+
+/* ── CLIPS MANAGEMENT ────────────────────────────────────── */
+function initClipsManager() {
+  const form      = document.getElementById('clipForm');
+  const cancelBtn = document.getElementById('clipCancelBtn');
+  const idField   = document.getElementById('clipId');
+  if (!form) return;
+
+  function renderList() {
+    const clips = window.dfApp.getData('clips') || window.dfApp.DEFAULT_DATA.clips;
+    const list  = document.getElementById('clipList');
+    if (!list) return;
+
+    if (!clips || clips.length === 0) {
+      list.innerHTML = '<p style="color:var(--text-muted);font-size:.9rem;text-align:center;padding:1rem;">No clips yet. Add one above.</p>';
+      return;
+    }
+
+    list.innerHTML = clips.map(c => {
+      const platformIcon = c.platform === 'tiktok' ? 'fab fa-tiktok' : 'fab fa-youtube';
+      return `
+        <div class="admin-list-item ${c.visible ? '' : 'hidden-item'}" data-id="${c.id}">
+          <div class="admin-list-item-info">
+            <div class="admin-list-item-title">
+              <i class="${platformIcon}"></i>
+              ${window.dfApp.escHtml(c.title)}
+            </div>
+            <div class="admin-list-item-sub">${window.dfApp.escHtml(c.embedUrl)}</div>
+          </div>
+          <div class="admin-list-item-actions">
+            <span class="visibility-badge ${c.visible ? 'visible' : 'hidden'}">
+              <i class="fas fa-${c.visible ? 'eye' : 'eye-slash'}"></i>
+              ${c.visible ? 'Visible' : 'Hidden'}
+            </span>
+            <button class="btn btn-outline btn-sm toggle-clip-btn" data-id="${c.id}" title="Toggle Visibility">
+              <i class="fas fa-${c.visible ? 'eye-slash' : 'eye'}"></i>
+            </button>
+            <button class="btn btn-outline btn-sm edit-clip-btn" data-id="${c.id}">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn btn-danger btn-sm delete-clip-btn" data-id="${c.id}">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>`;
+    }).join('');
+
+    list.querySelectorAll('.toggle-clip-btn').forEach(btn => {
+      btn.addEventListener('click', () => toggleClipVisibility(btn.dataset.id));
+    });
+    list.querySelectorAll('.edit-clip-btn').forEach(btn => {
+      btn.addEventListener('click', () => editClip(btn.dataset.id));
+    });
+    list.querySelectorAll('.delete-clip-btn').forEach(btn => {
+      btn.addEventListener('click', () => deleteClip(btn.dataset.id));
+    });
+  }
+
+  function resetForm() {
+    form.reset();
+    idField.value = '';
+    document.getElementById('clipFormTitle').textContent  = 'Add New Clip';
+    document.getElementById('clipSubmitText').textContent = 'Add Clip';
+    cancelBtn.style.display = 'none';
+  }
+
+  function editClip(id) {
+    const clips = window.dfApp.getData('clips') || window.dfApp.DEFAULT_DATA.clips;
+    const item = clips.find(c => c.id === id);
+    if (!item) return;
+
+    idField.value = id;
+    document.getElementById('clipTitle').value    = item.title    || '';
+    document.getElementById('clipEmbedUrl').value = item.embedUrl || '';
+    document.getElementById('clipPlatform').value = item.platform || 'youtube';
+    document.getElementById('clipFormTitle').textContent  = 'Edit Clip';
+    document.getElementById('clipSubmitText').textContent = 'Update Clip';
+    cancelBtn.style.display = 'inline-flex';
+    document.getElementById('section-clips').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function toggleClipVisibility(id) {
+    let clips = window.dfApp.getData('clips') || window.dfApp.DEFAULT_DATA.clips;
+    clips = clips.map(c => c.id === id ? { ...c, visible: !c.visible } : c);
+    saveData('clips', clips);
+    renderList();
+    const updated = clips.find(c => c.id === id);
+    showAdminToast(`Clip ${updated.visible ? 'shown' : 'hidden'} on public site.`);
+  }
+
+  function deleteClip(id) {
+    if (!confirm('Delete this clip? This action cannot be undone.')) return;
+    let clips = window.dfApp.getData('clips') || window.dfApp.DEFAULT_DATA.clips;
+    clips = clips.filter(c => c.id !== id);
+    saveData('clips', clips);
+    renderList();
+    showAdminToast('Clip deleted.');
+  }
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const title    = document.getElementById('clipTitle').value.trim();
+    const embedUrl = document.getElementById('clipEmbedUrl').value.trim();
+    const platform = document.getElementById('clipPlatform').value;
+    if (!title || !embedUrl) return;
+
+    let clips = window.dfApp.getData('clips') || window.dfApp.DEFAULT_DATA.clips;
+    const existingId = idField.value;
+
+    if (existingId) {
+      clips = clips.map(c => c.id === existingId ? { ...c, title, embedUrl, platform } : c);
+      showAdminToast('Clip updated successfully!');
+    } else {
+      clips.push({ id: generateId(), title, embedUrl, platform, visible: true });
+      showAdminToast('Clip added successfully!');
+    }
+
+    saveData('clips', clips);
+    renderList();
+    resetForm();
+  });
+
+  cancelBtn.addEventListener('click', resetForm);
+  renderList();
+}
+
+/* ── TESTIMONIALS MANAGEMENT ─────────────────────────────── */
+function initTestimonialsManager() {
+  const form      = document.getElementById('testimonialForm');
+  const cancelBtn = document.getElementById('testimonialCancelBtn');
+  const idField   = document.getElementById('testimonialId');
+  if (!form) return;
+
+  function renderList() {
+    const testimonials = window.dfApp.getData('testimonials') || window.dfApp.DEFAULT_DATA.testimonials;
+    const list = document.getElementById('testimonialList');
+    if (!list) return;
+
+    if (!testimonials || testimonials.length === 0) {
+      list.innerHTML = '<p style="color:var(--text-muted);font-size:.9rem;text-align:center;padding:1rem;">No testimonials yet. Add one above.</p>';
+      return;
+    }
+
+    list.innerHTML = testimonials.map(t => `
+      <div class="admin-list-item ${t.visible ? '' : 'hidden-item'}" data-id="${t.id}">
+        <div class="admin-list-item-info">
+          <div class="admin-list-item-title">
+            ${window.dfApp.escHtml(t.senderName)}
+            ${t.censored ? '<span class="admin-tag">Censored</span>' : ''}
+          </div>
+          <div class="admin-list-item-sub">${window.dfApp.escHtml(t.message)}</div>
+        </div>
+        <div class="admin-list-item-actions">
+          <span class="visibility-badge ${t.visible ? 'visible' : 'hidden'}">
+            <i class="fas fa-${t.visible ? 'eye' : 'eye-slash'}"></i>
+            ${t.visible ? 'Visible' : 'Hidden'}
+          </span>
+          <button class="btn btn-outline btn-sm toggle-test-btn" data-id="${t.id}" title="Toggle Visibility">
+            <i class="fas fa-${t.visible ? 'eye-slash' : 'eye'}"></i>
+          </button>
+          <button class="btn btn-outline btn-sm edit-test-btn" data-id="${t.id}">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button class="btn btn-danger btn-sm delete-test-btn" data-id="${t.id}">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </div>
+    `).join('');
+
+    list.querySelectorAll('.toggle-test-btn').forEach(btn => {
+      btn.addEventListener('click', () => toggleTestimonialVisibility(btn.dataset.id));
+    });
+    list.querySelectorAll('.edit-test-btn').forEach(btn => {
+      btn.addEventListener('click', () => editTestimonial(btn.dataset.id));
+    });
+    list.querySelectorAll('.delete-test-btn').forEach(btn => {
+      btn.addEventListener('click', () => deleteTestimonial(btn.dataset.id));
+    });
+  }
+
+  function resetForm() {
+    form.reset();
+    idField.value = '';
+    document.getElementById('testimonialFormTitle').textContent  = 'Add New Testimonial';
+    document.getElementById('testimonialSubmitText').textContent = 'Add Testimonial';
+    cancelBtn.style.display = 'none';
+  }
+
+  function editTestimonial(id) {
+    const testimonials = window.dfApp.getData('testimonials') || window.dfApp.DEFAULT_DATA.testimonials;
+    const item = testimonials.find(t => t.id === id);
+    if (!item) return;
+
+    idField.value = id;
+    document.getElementById('testimonialSenderName').value = item.senderName || '';
+    document.getElementById('testimonialMessage').value    = item.message    || '';
+    document.getElementById('testimonialCensored').checked = !!item.censored;
+    document.getElementById('testimonialFormTitle').textContent  = 'Edit Testimonial';
+    document.getElementById('testimonialSubmitText').textContent = 'Update Testimonial';
+    cancelBtn.style.display = 'inline-flex';
+    document.getElementById('section-testimonials').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function toggleTestimonialVisibility(id) {
+    let testimonials = window.dfApp.getData('testimonials') || window.dfApp.DEFAULT_DATA.testimonials;
+    testimonials = testimonials.map(t => t.id === id ? { ...t, visible: !t.visible } : t);
+    saveData('testimonials', testimonials);
+    renderList();
+    const updated = testimonials.find(t => t.id === id);
+    showAdminToast(`Testimonial ${updated.visible ? 'shown' : 'hidden'} on public site.`);
+  }
+
+  function deleteTestimonial(id) {
+    if (!confirm('Delete this testimonial? This action cannot be undone.')) return;
+    let testimonials = window.dfApp.getData('testimonials') || window.dfApp.DEFAULT_DATA.testimonials;
+    testimonials = testimonials.filter(t => t.id !== id);
+    saveData('testimonials', testimonials);
+    renderList();
+    showAdminToast('Testimonial deleted.');
+  }
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const senderName = document.getElementById('testimonialSenderName').value.trim();
+    const message    = document.getElementById('testimonialMessage').value.trim();
+    const censored   = document.getElementById('testimonialCensored').checked;
+    if (!senderName || !message) return;
+
+    let testimonials = window.dfApp.getData('testimonials') || window.dfApp.DEFAULT_DATA.testimonials;
+    const existingId = idField.value;
+
+    if (existingId) {
+      testimonials = testimonials.map(t => t.id === existingId ? { ...t, senderName, message, censored } : t);
+      showAdminToast('Testimonial updated successfully!');
+    } else {
+      testimonials.push({ id: generateId(), senderName, message, censored, visible: true });
+      showAdminToast('Testimonial added successfully!');
+    }
+
+    saveData('testimonials', testimonials);
+    renderList();
+    resetForm();
+  });
+
+  cancelBtn.addEventListener('click', resetForm);
+  renderList();
+}
+
 /* ── INIT ALL ────────────────────────────────────────────── */
 function initAdminApp() {
   initSidebarNav();
@@ -624,6 +1023,9 @@ function initAdminApp() {
   initProfileManager();
   initSocialManager();
   initStatsManager();
+  initSeasonStatsManager();
+  initClipsManager();
+  initTestimonialsManager();
 }
 
 /* ── BOOT ────────────────────────────────────────────────── */

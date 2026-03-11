@@ -86,6 +86,15 @@
           <li><a href="#" class="admin-nav-link" data-section="stats">
             <i class="fas fa-chart-bar"></i> Player Stats
           </a></li>
+          <li><a href="#" class="admin-nav-link" data-section="seasonStats">
+            <i class="fas fa-chart-area"></i> Season Stats
+          </a></li>
+          <li><a href="#" class="admin-nav-link" data-section="clips">
+            <i class="fas fa-film"></i> Clips
+          </a></li>
+          <li><a href="#" class="admin-nav-link" data-section="testimonials">
+            <i class="fas fa-quote-left"></i> Testimonials
+          </a></li>
         </ul>
       </aside>
 
@@ -429,6 +438,195 @@
                 <button type="button" class="btn btn-outline" id="addStatBtn"><i class="fas fa-plus"></i> Add Stat</button>
               </div>
             </form>
+          </div>
+        </div>
+
+        <!-- SEASON STATS SECTION -->
+        <div class="admin-section" id="section-seasonStats">
+          <div class="admin-section-header">
+            <h2><i class="fas fa-chart-area"></i> Season Stats Management</h2>
+          </div>
+
+          <!-- Add/Edit Form -->
+          <div class="admin-card">
+            <h3 id="seasonFormTitle">Add New Season</h3>
+            <form id="seasonForm">
+              <input type="hidden" id="seasonId" />
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="seasonName">Season Name / Number</label>
+                  <input type="text" id="seasonName" placeholder="e.g. Season 1, Pre-Season" required />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>A/D Stats</label>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="adKpm" class="label-sm">KPM</label>
+                      <input type="number" id="adKpm" step="0.01" min="0" placeholder="2.45" />
+                    </div>
+                    <div class="form-group">
+                      <label for="adSpm" class="label-sm">SPM</label>
+                      <input type="number" id="adSpm" step="0.1" min="0" placeholder="185.3" />
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Victory Unite Stats</label>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="vuKpm" class="label-sm">KPM</label>
+                      <input type="number" id="vuKpm" step="0.01" min="0" placeholder="3.12" />
+                    </div>
+                    <div class="form-group">
+                      <label for="vuSpm" class="label-sm">SPM</label>
+                      <input type="number" id="vuSpm" step="0.1" min="0" placeholder="220.5" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Radar Chart (0–100)</label>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="radarShooting" class="label-sm">Shooting</label>
+                    <input type="number" id="radarShooting" min="0" max="100" value="50" class="radar-input" />
+                  </div>
+                  <div class="form-group">
+                    <label for="radarSurvival" class="label-sm">Survival</label>
+                    <input type="number" id="radarSurvival" min="0" max="100" value="50" class="radar-input" />
+                  </div>
+                  <div class="form-group">
+                    <label for="radarCoop" class="label-sm">Co-op</label>
+                    <input type="number" id="radarCoop" min="0" max="100" value="50" class="radar-input" />
+                  </div>
+                  <div class="form-group">
+                    <label for="radarObjective" class="label-sm">Objective</label>
+                    <input type="number" id="radarObjective" min="0" max="100" value="50" class="radar-input" />
+                  </div>
+                  <div class="form-group">
+                    <label for="radarVehicle" class="label-sm">Vehicle</label>
+                    <input type="number" id="radarVehicle" min="0" max="100" value="50" class="radar-input" />
+                  </div>
+                </div>
+                <!-- Live radar preview -->
+                <div class="radar-preview-wrapper">
+                  <canvas id="adminRadarPreview" width="220" height="220"></canvas>
+                </div>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-save"></i> <span id="seasonSubmitText">Add Season</span>
+                </button>
+                <button type="button" class="btn btn-outline" id="seasonCancelBtn" style="display:none">
+                  <i class="fas fa-times"></i> Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Season List -->
+          <div class="admin-card">
+            <h3>Existing Seasons</h3>
+            <div id="seasonList" class="admin-list">
+              <!-- Filled by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- CLIPS SECTION -->
+        <div class="admin-section" id="section-clips">
+          <div class="admin-section-header">
+            <h2><i class="fas fa-film"></i> Clips Management</h2>
+          </div>
+
+          <!-- Add/Edit Form -->
+          <div class="admin-card">
+            <h3 id="clipFormTitle">Add New Clip</h3>
+            <form id="clipForm">
+              <input type="hidden" id="clipId" />
+              <div class="form-group">
+                <label for="clipTitle">Clip Title</label>
+                <input type="text" id="clipTitle" placeholder="e.g. Insane AWM Quickscope" required />
+              </div>
+              <div class="form-group">
+                <label for="clipEmbedUrl">Embed URL</label>
+                <input type="url" id="clipEmbedUrl" placeholder="https://www.youtube.com/embed/VIDEO_ID" required />
+              </div>
+              <div class="form-group">
+                <label for="clipPlatform">Platform</label>
+                <select id="clipPlatform">
+                  <option value="youtube">YouTube</option>
+                  <option value="tiktok">TikTok</option>
+                </select>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-save"></i> <span id="clipSubmitText">Add Clip</span>
+                </button>
+                <button type="button" class="btn btn-outline" id="clipCancelBtn" style="display:none">
+                  <i class="fas fa-times"></i> Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Clip List -->
+          <div class="admin-card">
+            <h3>Existing Clips</h3>
+            <div id="clipList" class="admin-list">
+              <!-- Filled by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- TESTIMONIALS SECTION -->
+        <div class="admin-section" id="section-testimonials">
+          <div class="admin-section-header">
+            <h2><i class="fas fa-quote-left"></i> Testimonials Management</h2>
+          </div>
+
+          <!-- Add/Edit Form -->
+          <div class="admin-card">
+            <h3 id="testimonialFormTitle">Add New Testimonial</h3>
+            <form id="testimonialForm">
+              <input type="hidden" id="testimonialId" />
+              <div class="form-group">
+                <label for="testimonialSenderName">Sender Name</label>
+                <input type="text" id="testimonialSenderName" placeholder="e.g. John" required />
+              </div>
+              <div class="form-group">
+                <label for="testimonialMessage">Message</label>
+                <textarea id="testimonialMessage" rows="3" placeholder="Write testimonial text here..." required></textarea>
+              </div>
+              <div class="form-row">
+                <div class="form-group form-group-center">
+                  <label>Censor Name on Public Site</label>
+                  <label class="toggle-label">
+                    <input type="checkbox" id="testimonialCensored" />
+                    <span class="toggle-switch"></span>
+                    <span class="toggle-text">Partially hide name (e.g. J**n)</span>
+                  </label>
+                </div>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-save"></i> <span id="testimonialSubmitText">Add Testimonial</span>
+                </button>
+                <button type="button" class="btn btn-outline" id="testimonialCancelBtn" style="display:none">
+                  <i class="fas fa-times"></i> Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Testimonial List -->
+          <div class="admin-card">
+            <h3>Existing Testimonials</h3>
+            <div id="testimonialList" class="admin-list">
+              <!-- Filled by JS -->
+            </div>
           </div>
         </div>
 

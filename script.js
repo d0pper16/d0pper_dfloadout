@@ -71,6 +71,61 @@ const DEFAULT_DATA = {
     { name: 'Recoil Control',  value: 82 },
     { name: 'Communication',   value: 90 },
     { name: 'Map Awareness',   value: 75 }
+  ],
+  clips: [
+    {
+      id: 'clip-001',
+      title: 'Insane AWM Quickscope Montage',
+      embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      platform: 'youtube',
+      visible: true
+    },
+    {
+      id: 'clip-002',
+      title: 'CQB Highlights — Delta Force',
+      embedUrl: 'https://www.tiktok.com/embed/v2/7000000000000000000',
+      platform: 'tiktok',
+      visible: true
+    }
+  ],
+  testimonials: [
+    {
+      id: 'test-001',
+      senderName: 'Alexander',
+      message: 'Best Delta Force player I\'ve ever teamed with! Insane game sense and always clutching rounds.',
+      censored: false,
+      visible: true
+    },
+    {
+      id: 'test-002',
+      senderName: 'Sarah',
+      message: 'D0pper\'s loadout codes are top-tier. My K/D went up immediately after using the M4A1 CQB build.',
+      censored: true,
+      visible: true
+    },
+    {
+      id: 'test-003',
+      senderName: 'Muhammad',
+      message: 'Teaming up with d0pper is always a W. Solid comms, precise aim, and great strategy every match.',
+      censored: true,
+      visible: true
+    }
+  ],
+  seasonStats: [
+    {
+      id: 'season-001',
+      seasonName: 'Season 1',
+      adStats: { kpm: 2.45, spm: 185.3 },
+      victoryUnite: { kpm: 3.12, spm: 220.5 },
+      radarChart: { shooting: 85, survival: 70, coop: 90, objective: 65, vehicle: 40 }
+    },
+    {
+      id: 'season-002',
+      seasonName: 'Season 2',
+      adStats: { kpm: 2.78, spm: 210.0 },
+      victoryUnite: { kpm: 3.45, spm: 255.8 },
+      radarChart: { shooting: 88, survival: 75, coop: 82, objective: 72, vehicle: 55 }
+    }
   ]
 };
 
@@ -92,7 +147,10 @@ function getAllData() {
     pcSpecs:      getData('pcSpecs')      || DEFAULT_DATA.pcSpecs,
     profile:      getData('profile')      || DEFAULT_DATA.profile,
     socialLinks:  getData('socialLinks')  || DEFAULT_DATA.socialLinks,
-    stats:        getData('stats')        || DEFAULT_DATA.stats
+    stats:        getData('stats')        || DEFAULT_DATA.stats,
+    clips:        getData('clips')        || DEFAULT_DATA.clips,
+    testimonials: getData('testimonials') || DEFAULT_DATA.testimonials,
+    seasonStats:  getData('seasonStats')  || DEFAULT_DATA.seasonStats
   };
 }
 
@@ -507,10 +565,242 @@ function renderProfile(profile) {
   `;
 }
 
+/* ── RENDER CLIPS ────────────────────────────────────────── */
+function renderClips(clips) {
+  const grid = document.getElementById('clipsGrid');
+  if (!grid) return;
+
+  const visible = clips ? clips.filter(c => c.visible) : [];
+
+  if (visible.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <i class="fas fa-film"></i>
+        <p>No gameplay clips available yet.<br>Check back soon for highlights!</p>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = visible.map(c => {
+    const platformIcon = c.platform === 'tiktok' ? 'fab fa-tiktok' : 'fab fa-youtube';
+    const platformLabel = c.platform === 'tiktok' ? 'TikTok' : 'YouTube';
+    return `
+      <div class="clip-card">
+        <div class="clip-header">
+          <i class="${platformIcon}"></i>
+          <span class="clip-platform-label">${platformLabel}</span>
+          <div class="clip-title">${escHtml(c.title)}</div>
+        </div>
+        <div class="clip-embed-wrapper">
+          <iframe
+            src="${escHtml(c.embedUrl)}"
+            title="${escHtml(c.title)}"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+            loading="lazy"
+          ></iframe>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+/* ── CENSOR NAME ─────────────────────────────────────────── */
+function censorName(name) {
+  if (!name) return '';
+  if (name.length <= 2) return name[0] + '*';
+  return name[0] + '*'.repeat(name.length - 2) + name[name.length - 1];
+}
+
+/* ── RENDER TESTIMONIALS ─────────────────────────────────── */
+function renderTestimonials(testimonials) {
+  const grid = document.getElementById('testimonialsGrid');
+  if (!grid) return;
+
+  const visible = testimonials ? testimonials.filter(t => t.visible) : [];
+
+  if (visible.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <i class="fas fa-quote-left"></i>
+        <p>No testimonials yet.</p>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = visible.map(t => {
+    const displayName = t.censored ? censorName(t.senderName) : t.senderName;
+    return `
+      <div class="testimonial-card">
+        <div class="testimonial-quote-icon"><i class="fas fa-quote-left"></i></div>
+        <div class="testimonial-message">${escHtml(t.message)}</div>
+        <div class="testimonial-sender">
+          <i class="fas fa-user-circle"></i>
+          <span>${escHtml(displayName)}</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+/* ── DRAW RADAR CHART ────────────────────────────────────── */
+function drawRadarChart(canvas, radarData) {
+  if (!canvas) return;
+  const ctx    = canvas.getContext('2d');
+  const size   = canvas.width;
+  const cx     = size / 2;
+  const cy     = size / 2;
+  const maxR   = size * 0.38;
+  const labels = ['Shooting', 'Survival', 'Co-op', 'Objective', 'Vehicle'];
+  const values = [
+    Number(radarData.shooting)  || 0,
+    Number(radarData.survival)  || 0,
+    Number(radarData.coop)      || 0,
+    Number(radarData.objective) || 0,
+    Number(radarData.vehicle)   || 0
+  ];
+  const n      = 5;
+  const step   = (2 * Math.PI) / n;
+  const start  = -Math.PI / 2; /* top */
+  const accent = '#0ff796';
+
+  ctx.clearRect(0, 0, size, size);
+
+  /* Grid rings */
+  [20, 40, 60, 80, 100].forEach(pct => {
+    const r = maxR * (pct / 100);
+    ctx.beginPath();
+    for (let i = 0; i < n; i++) {
+      const angle = start + i * step;
+      const x = cx + r * Math.cos(angle);
+      const y = cy + r * Math.sin(angle);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+    ctx.lineWidth   = 1;
+    ctx.stroke();
+  });
+
+  /* Axis lines */
+  for (let i = 0; i < n; i++) {
+    const angle = start + i * step;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + maxR * Math.cos(angle), cy + maxR * Math.sin(angle));
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+    ctx.lineWidth   = 1;
+    ctx.stroke();
+  }
+
+  /* Filled polygon */
+  ctx.beginPath();
+  values.forEach((val, i) => {
+    const r     = maxR * Math.min(val, 100) / 100;
+    const angle = start + i * step;
+    const x     = cx + r * Math.cos(angle);
+    const y     = cy + r * Math.sin(angle);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.closePath();
+  ctx.fillStyle   = 'rgba(15,247,150,0.25)';
+  ctx.fill();
+  ctx.strokeStyle = accent;
+  ctx.lineWidth   = 2;
+  ctx.stroke();
+
+  /* Dots at each vertex */
+  values.forEach((val, i) => {
+    const r     = maxR * Math.min(val, 100) / 100;
+    const angle = start + i * step;
+    ctx.beginPath();
+    ctx.arc(cx + r * Math.cos(angle), cy + r * Math.sin(angle), 3, 0, 2 * Math.PI);
+    ctx.fillStyle = accent;
+    ctx.fill();
+  });
+
+  /* Labels */
+  const labelOffset = maxR + 20;
+  ctx.fillStyle  = 'rgba(255,255,255,0.75)';
+  ctx.font       = `bold ${Math.floor(size * 0.065)}px Rajdhani, sans-serif`;
+  ctx.textAlign  = 'center';
+  ctx.textBaseline = 'middle';
+  labels.forEach((label, i) => {
+    const angle = start + i * step;
+    const lx = cx + labelOffset * Math.cos(angle);
+    const ly = cy + labelOffset * Math.sin(angle);
+    ctx.fillText(label, lx, ly);
+  });
+}
+
+/* ── RENDER SEASON STATS ─────────────────────────────────── */
+function renderSeasonStats(seasonStats) {
+  const grid = document.getElementById('seasonStatsGrid');
+  if (!grid) return;
+
+  if (!seasonStats || seasonStats.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <i class="fas fa-chart-area"></i>
+        <p>No season stats available yet.</p>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = seasonStats.map(s => {
+    const r = s.radarChart || {};
+    const radarValues = [
+      { label: 'Shooting',  value: r.shooting  || 0 },
+      { label: 'Survival',  value: r.survival  || 0 },
+      { label: 'Co-op',     value: r.coop      || 0 },
+      { label: 'Objective', value: r.objective || 0 },
+      { label: 'Vehicle',   value: r.vehicle   || 0 }
+    ];
+    return `
+      <div class="season-card">
+        <div class="season-card-title">
+          <i class="fas fa-chart-area"></i>
+          ${escHtml(s.seasonName)}
+        </div>
+        <div class="season-card-body">
+          <div class="season-stats-row">
+            <div class="season-stats-col">
+              <div class="season-stat-group-title">A/D Stats</div>
+              <div class="season-stat-line"><span>KPM</span><span>${Number(s.adStats?.kpm) || 0}</span></div>
+              <div class="season-stat-line"><span>SPM</span><span>${Number(s.adStats?.spm) || 0}</span></div>
+            </div>
+            <div class="season-stats-col">
+              <div class="season-stat-group-title">Victory Unite</div>
+              <div class="season-stat-line"><span>KPM</span><span>${Number(s.victoryUnite?.kpm) || 0}</span></div>
+              <div class="season-stat-line"><span>SPM</span><span>${Number(s.victoryUnite?.spm) || 0}</span></div>
+            </div>
+          </div>
+          <div class="season-radar-wrapper">
+            <canvas class="radar-canvas" data-id="${escHtml(s.id)}" width="260" height="260"></canvas>
+          </div>
+          <div class="season-radar-legend">
+            ${radarValues.map(rv => `
+              <div class="radar-legend-item">
+                <span class="radar-legend-dot"></span>
+                <span>${escHtml(rv.label)}</span>
+                <span class="radar-legend-val">${rv.value}</span>
+              </div>`).join('')}
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+
+  /* Draw radar charts after DOM is ready */
+  grid.querySelectorAll('.radar-canvas').forEach(canvas => {
+    const id = canvas.dataset.id;
+    const s  = seasonStats.find(x => x.id === id);
+    if (s && s.radarChart) drawRadarChart(canvas, s.radarChart);
+  });
+}
+
 /* ── SCROLL ANIMATIONS ───────────────────────────────────── */
 function initScrollAnimations() {
   const targets = document.querySelectorAll(
-    '.loadout-card, .featured-loadout-card, .achievement-card, .setting-card, .stat-bar-item, .spec-item'
+    '.loadout-card, .featured-loadout-card, .achievement-card, .setting-card, .stat-bar-item, .spec-item, .clip-card, .testimonial-card, .season-card'
   );
 
   const observer = new IntersectionObserver(entries => {
@@ -559,10 +849,13 @@ document.addEventListener('DOMContentLoaded', () => {
     renderSocialLinks(data.socialLinks);
     renderLoadouts(data.loadouts);
     renderSettings(data.settings);
+    renderSeasonStats(data.seasonStats);
     renderAchievements(data.achievements);
+    renderClips(data.clips);
     renderPcSpecs(data.pcSpecs);
     renderStats(data.stats);
     renderProfile(data.profile);
+    renderTestimonials(data.testimonials);
     initLightbox();
     initNavScroll();
     initHamburger();
@@ -576,5 +869,7 @@ window.dfApp = {
   getData,
   getAllData,
   escHtml,
-  DEFAULT_DATA
+  DEFAULT_DATA,
+  drawRadarChart,
+  censorName
 };
