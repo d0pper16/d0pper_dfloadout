@@ -1,5 +1,5 @@
 /* ============================================================
-   style.css — GUNSMITH DELTAFORCE by D0PPER. | Military Tactical Theme
+   style.css — D0PPER. | Military Tactical Theme
    ============================================================ */
 
 /* ── GOOGLE FONTS ────────────────────────────────────────── */
@@ -1289,4 +1289,253 @@ ul { list-style: none; }
   .section { padding: 3.5rem 0; }
   .toast { left: 1rem; right: 1rem; text-align: center; justify-content: center; }
   .hero-title { font-size: 1.6rem; }
+}
+
+/* ── FAVORITE WEAPONS SECTION ───────────────────────────── */
+#favoriteSection {
+  margin-bottom: 2rem;
+}
+
+.favorite-section-title {
+  font-size: 1.4rem;
+  color: var(--accent2);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.favorite-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.favorite-loadout-card {
+  background: var(--bg-card);
+  border: 2px solid #0ff796;
+  border-radius: 12px;
+  padding: 1.5rem;
+  position: relative;
+  box-shadow: 0 0 16px rgba(15, 247, 150, 0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.favorite-loadout-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0 28px rgba(15, 247, 150, 0.4);
+}
+
+.favorite-badge {
+  position: absolute;
+  top: -1px;
+  right: 12px;
+  background: #0ff796;
+  color: #0a0e0a;
+  font-size: 0.65rem;
+  font-weight: 700;
+  font-family: 'Rajdhani', sans-serif;
+  letter-spacing: 0.08em;
+  padding: 2px 10px;
+  border-radius: 0 0 8px 8px;
+}
+
+/* ── CLIPS SECTION ───────────────────────────────────────── */
+.clips-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.clip-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.clip-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow);
+}
+
+.clip-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent2);
+  padding: 0.75rem 1rem 0.5rem;
+}
+
+.clip-embed {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+}
+
+.clip-embed iframe {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.clip-desc {
+  padding: 0.5rem 1rem 0.75rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* ── TESTIMONIALS SECTION ────────────────────────────────── */
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.testimonial-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.testimonial-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow);
+}
+
+.testimonial-quote {
+  font-size: 2rem;
+  color: var(--accent2);
+  opacity: 0.4;
+  margin-bottom: 0.75rem;
+}
+
+.testimonial-message {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  font-style: italic;
+}
+
+.testimonial-sender {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--accent2);
+  font-family: 'Rajdhani', sans-serif;
+}
+
+.censored-badge {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+/* ── SEASON STATS SECTION ────────────────────────────────── */
+.season-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.season-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.season-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow);
+}
+
+.season-header {
+  background: rgba(15, 247, 150, 0.08);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0.75rem 1.25rem;
+}
+
+.season-name {
+  font-size: 1.2rem;
+  color: var(--accent2);
+  margin: 0;
+}
+
+.season-body {
+  padding: 1rem 1.25rem;
+}
+
+.season-stats-cols {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.season-stat-col {
+  flex: 1;
+}
+
+.season-mode-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: 'Rajdhani', sans-serif;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+}
+
+.season-stat-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  padding: 2px 0;
+}
+
+.stat-val {
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: 'Rajdhani', sans-serif;
+}
+
+.radar-chart-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.radar-chart {
+  width: 100%;
+  max-width: 220px;
+  height: auto;
+}
+
+/* ── EMPTY STATE (shared) ────────────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-muted);
+}
+
+.empty-state i {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  display: block;
+  opacity: 0.5;
+}
+
+.empty-state p {
+  font-size: 0.95rem;
 }

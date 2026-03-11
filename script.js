@@ -1,5 +1,5 @@
 /* ============================================================
-   script.js — GUNSMITH DELTAFORCE by D0PPER. | Public Site Logic
+   script.js — D0PPER. | Public Site Logic
    ============================================================ */
 
 'use strict';
@@ -71,6 +71,24 @@ const DEFAULT_DATA = {
     { name: 'Recoil Control',  value: 82 },
     { name: 'Communication',   value: 90 },
     { name: 'Map Awareness',   value: 75 }
+  ],
+  clips: [],
+  testimonials: [],
+  seasonStats: [
+    {
+      id: 'season-001',
+      season: 'Season 1',
+      ad: { kpm: 2.1, spm: 155 },
+      victoryUnite: { kpm: 2.8, spm: 190 },
+      radar: { shooting: 75, survival: 65, coop: 55, objective: 70, vehicle: 40 }
+    },
+    {
+      id: 'season-002',
+      season: 'Season 2',
+      ad: { kpm: 2.8, spm: 180 },
+      victoryUnite: { kpm: 3.5, spm: 240 },
+      radar: { shooting: 85, survival: 72, coop: 68, objective: 78, vehicle: 50 }
+    }
   ]
 };
 
@@ -92,7 +110,10 @@ function getAllData() {
     pcSpecs:      getData('pcSpecs')      || DEFAULT_DATA.pcSpecs,
     profile:      getData('profile')      || DEFAULT_DATA.profile,
     socialLinks:  getData('socialLinks')  || DEFAULT_DATA.socialLinks,
-    stats:        getData('stats')        || DEFAULT_DATA.stats
+    stats:        getData('stats')        || DEFAULT_DATA.stats,
+    clips:        getData('clips')        || DEFAULT_DATA.clips,
+    testimonials: getData('testimonials') || DEFAULT_DATA.testimonials,
+    seasonStats:  getData('seasonStats')  || DEFAULT_DATA.seasonStats
   };
 }
 
@@ -168,10 +189,18 @@ function initHamburger() {
 function initVisitorCounter() {
   const el = document.getElementById('viewCount');
   if (!el) return;
-  let views = parseInt(localStorage.getItem('dfloadout_views') || '0', 10);
-  views += 1;
-  localStorage.setItem('dfloadout_views', views);
-  el.textContent = views.toLocaleString();
+  let viewsData;
+  try {
+    viewsData = JSON.parse(localStorage.getItem('dfloadout_views') || 'null');
+  } catch(e) { viewsData = null; }
+  if (!viewsData || typeof viewsData !== 'object') {
+    const oldVal = parseInt(localStorage.getItem('dfloadout_views') || '0', 10);
+    viewsData = { baseCount: 0, realVisits: isNaN(oldVal) ? 0 : oldVal };
+  }
+  viewsData.realVisits = (viewsData.realVisits || 0) + 1;
+  localStorage.setItem('dfloadout_views', JSON.stringify(viewsData));
+  const total = (viewsData.baseCount || 0) + viewsData.realVisits;
+  el.textContent = total.toLocaleString();
 }
 
 /* ── RENDER SOCIAL LINKS ─────────────────────────────────── */
@@ -223,12 +252,15 @@ function renderHeroStats(data) {
 
 /* ── RENDER LOADOUTS ─────────────────────────────────────── */
 function renderLoadouts(loadouts) {
-  const grid       = document.getElementById('loadoutGrid');
-  const filterEl   = document.getElementById('loadoutFilter');
+  const grid        = document.getElementById('loadoutGrid');
+  const filterEl    = document.getElementById('loadoutFilter');
+  const favSection  = document.getElementById('favoriteSection');
+  const favGrid     = document.getElementById('favoriteGrid');
   if (!grid) return;
 
   if (!loadouts || loadouts.length === 0) {
     if (filterEl) filterEl.innerHTML = '';
+    if (favSection) favSection.style.display = 'none';
     grid.innerHTML = `
       <div class="empty-state">
         <i class="fas fa-crosshairs"></i>
@@ -249,29 +281,53 @@ function renderLoadouts(loadouts) {
         filterEl.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         const cat = btn.dataset.cat;
-        grid.querySelectorAll('.loadout-card, .featured-loadout-card').forEach(card => {
-          if (cat === 'All' || card.dataset.category === cat) {
-            card.style.display = '';
-          } else {
-            card.style.display = 'none';
-          }
+        grid.querySelectorAll('.loadout-card').forEach(card => {
+          card.style.display = (cat === 'All' || card.dataset.category === cat) ? '' : 'none';
         });
+        if (favGrid) {
+          favGrid.querySelectorAll('.favorite-loadout-card').forEach(card => {
+            card.style.display = (cat === 'All' || card.dataset.category === cat) ? '' : 'none';
+          });
+        }
       });
     });
   }
 
-  /* Sort: featured first */
-  const featured    = loadouts.filter(l => l.featured);
-  const nonFeatured = loadouts.filter(l => !l.featured);
-  const sorted      = [...featured, ...nonFeatured];
+  /* Render favorites */
+  const favorites    = loadouts.filter(l => l.featured);
+  const nonFavorites = loadouts.filter(l => !l.featured);
 
-  grid.innerHTML = sorted.map(l => {
-    const isFeat  = l.featured;
-    const catTag  = l.category ? `<span class="loadout-category-tag">${escHtml(l.category)}</span>` : '';
-    const featBadge = isFeat ? `<div class="featured-badge">⭐ FEATURED</div>` : '';
+  if (favSection) {
+    if (favorites.length > 0) {
+      favSection.style.display = 'block';
+      favGrid.innerHTML = favorites.map(l => {
+        const catTag = l.category ? `<span class="loadout-category-tag">${escHtml(l.category)}</span>` : '';
+        return `
+          <div class="favorite-loadout-card" data-category="${escHtml(l.category || '')}">
+            <div class="favorite-badge">⭐ FAVORITE</div>
+            <div class="loadout-card-header">
+              <div class="loadout-icon"><i class="fas fa-crosshairs"></i></div>
+              <div class="loadout-title">${escHtml(l.title)}</div>
+              ${catTag}
+            </div>
+            <div class="loadout-code-label">Weapon Code</div>
+            <div class="loadout-code">${escHtml(l.code)}</div>
+            <button class="copy-btn" data-code="${escHtml(l.code)}">
+              <i class="fas fa-copy"></i> Copy Code
+            </button>
+          </div>`;
+      }).join('');
+      favGrid.querySelectorAll('.copy-btn').forEach(btn => btn.addEventListener('click', handleCopy));
+    } else {
+      favSection.style.display = 'none';
+    }
+  }
+
+  /* Render non-favorites */
+  grid.innerHTML = nonFavorites.map(l => {
+    const catTag = l.category ? `<span class="loadout-category-tag">${escHtml(l.category)}</span>` : '';
     return `
-      <div class="${isFeat ? 'featured-loadout-card' : 'loadout-card'}" data-category="${escHtml(l.category || '')}">
-        ${featBadge}
+      <div class="loadout-card" data-category="${escHtml(l.category || '')}">
         <div class="loadout-card-header">
           <div class="loadout-icon"><i class="fas fa-crosshairs"></i></div>
           <div class="loadout-title">${escHtml(l.title)}</div>
@@ -285,9 +341,7 @@ function renderLoadouts(loadouts) {
       </div>`;
   }).join('');
 
-  grid.querySelectorAll('.copy-btn').forEach(btn => {
-    btn.addEventListener('click', handleCopy);
-  });
+  grid.querySelectorAll('.copy-btn').forEach(btn => btn.addEventListener('click', handleCopy));
 }
 
 function handleCopy(e) {
@@ -507,10 +561,155 @@ function renderProfile(profile) {
   `;
 }
 
+/* ── RENDER CLIPS ────────────────────────────────────────── */
+function convertToEmbedUrl(url) {
+  if (!url) return '';
+  const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]+)/);
+  if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}`;
+  if (url.includes('youtube.com/embed/') || url.includes('tiktok.com/embed')) return url;
+  return url;
+}
+
+function renderClips(clips) {
+  const grid = document.getElementById('clipsGrid');
+  if (!grid) return;
+  const visible = clips.filter(c => c.visible);
+  if (visible.length === 0) {
+    grid.innerHTML = '<div class="empty-state"><i class="fas fa-video"></i><p>No clips added yet.</p></div>';
+    return;
+  }
+  grid.innerHTML = visible.map(c => {
+    const embedUrl = convertToEmbedUrl(c.videoUrl);
+    const desc = c.description ? `<p class="clip-desc">${escHtml(c.description)}</p>` : '';
+    return `
+      <div class="clip-card">
+        <div class="clip-title">${escHtml(c.title)}</div>
+        <div class="clip-embed">
+          <iframe src="${escHtml(embedUrl)}" frameborder="0" allowfullscreen loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
+          </iframe>
+        </div>
+        ${desc}
+      </div>`;
+  }).join('');
+}
+
+/* ── RENDER TESTIMONIALS ─────────────────────────────────── */
+function censorName(name) {
+  if (!name) return 'Anonymous';
+  return name.split(' ').map(word => {
+    if (word.length <= 2) return word;
+    return word[0] + '*'.repeat(word.length - 2) + word[word.length - 1];
+  }).join(' ');
+}
+
+function renderTestimonials(testimonials) {
+  const grid = document.getElementById('testimonialsGrid');
+  if (!grid) return;
+  const visible = testimonials.filter(t => t.visible);
+  if (visible.length === 0) {
+    grid.innerHTML = '<div class="empty-state"><i class="fas fa-comment"></i><p>No testimonials yet.</p></div>';
+    return;
+  }
+  grid.innerHTML = visible.map(t => {
+    const displayName = t.censored ? censorName(t.senderName) : escHtml(t.senderName);
+    return `
+      <div class="testimonial-card">
+        <div class="testimonial-quote"><i class="fas fa-quote-left"></i></div>
+        <p class="testimonial-message">${escHtml(t.message)}</p>
+        <div class="testimonial-sender">— ${displayName}${t.censored ? ' <span class="censored-badge">🔒</span>' : ''}</div>
+      </div>`;
+  }).join('');
+}
+
+/* ── RENDER SEASON STATS ─────────────────────────────────── */
+function buildRadarSVG(radar) {
+  const cx = 110, cy = 110, maxR = 80;
+  const axes = [
+    { key: 'shooting',  label: 'Shooting',  angle: 90 },
+    { key: 'survival',  label: 'Survival',  angle: 18 },
+    { key: 'coop',      label: 'Co-op',     angle: -54 },
+    { key: 'objective', label: 'Objective', angle: -126 },
+    { key: 'vehicle',   label: 'Vehicle',   angle: 162 }
+  ];
+
+  function pt(angle, r) {
+    const rad = (angle * Math.PI) / 180;
+    return { x: cx + r * Math.cos(rad), y: cy - r * Math.sin(rad) };
+  }
+
+  const gridLevels = [20, 40, 60, 80, 100];
+  const gridLines = gridLevels.map(level => {
+    const r = (level / 100) * maxR;
+    const points = axes.map(a => pt(a.angle, r));
+    return `<polygon points="${points.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')}" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>`;
+  }).join('');
+
+  const axisLines = axes.map(a => {
+    const end = pt(a.angle, maxR);
+    return `<line x1="${cx}" y1="${cy}" x2="${end.x.toFixed(1)}" y2="${end.y.toFixed(1)}" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>`;
+  }).join('');
+
+  const dataPoints = axes.map(a => {
+    const val = Math.min(100, Math.max(0, radar[a.key] || 0));
+    return pt(a.angle, (val / 100) * maxR);
+  });
+  const dataPolygon = `<polygon points="${dataPoints.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')}" fill="rgba(15,247,150,0.3)" stroke="#0ff796" stroke-width="2"/>`;
+  const dataDots = dataPoints.map(p => `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4" fill="#0ff796"/>`).join('');
+
+  const labels = axes.map(a => {
+    const labelR = maxR + 22;
+    const p = pt(a.angle, labelR);
+    const anchor = p.x < cx - 5 ? 'end' : p.x > cx + 5 ? 'start' : 'middle';
+    return `<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" text-anchor="${anchor}" dominant-baseline="middle" fill="rgba(255,255,255,0.8)" font-size="10" font-family="Rajdhani,sans-serif">${a.label}</text>`;
+  }).join('');
+
+  return `<svg class="radar-chart" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+    ${gridLines}${axisLines}${dataPolygon}${dataDots}${labels}
+  </svg>`;
+}
+
+function renderSeasonStats(seasonStats) {
+  const grid = document.getElementById('seasonStatsGrid');
+  if (!grid) return;
+  if (!seasonStats || seasonStats.length === 0) {
+    grid.innerHTML = '<div class="empty-state"><i class="fas fa-chart-bar"></i><p>No season stats added yet.</p></div>';
+    return;
+  }
+  grid.innerHTML = seasonStats.map(s => {
+    const radar = s.radar || {};
+    const ad = s.ad || {};
+    const vu = s.victoryUnite || {};
+    return `
+      <div class="season-card">
+        <div class="season-header">
+          <h3 class="season-name">${escHtml(s.season || 'Season')}</h3>
+        </div>
+        <div class="season-body">
+          <div class="season-stats-cols">
+            <div class="season-stat-col">
+              <div class="season-mode-label">⚔️ A/D</div>
+              <div class="season-stat-row"><span>KPM</span><span class="stat-val">${escHtml(String(ad.kpm ?? '—'))}</span></div>
+              <div class="season-stat-row"><span>SPM</span><span class="stat-val">${escHtml(String(ad.spm ?? '—'))}</span></div>
+            </div>
+            <div class="season-stat-col">
+              <div class="season-mode-label">🏆 Victory Unite</div>
+              <div class="season-stat-row"><span>KPM</span><span class="stat-val">${escHtml(String(vu.kpm ?? '—'))}</span></div>
+              <div class="season-stat-row"><span>SPM</span><span class="stat-val">${escHtml(String(vu.spm ?? '—'))}</span></div>
+            </div>
+          </div>
+          <div class="radar-chart-container">
+            ${buildRadarSVG(radar)}
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
 /* ── SCROLL ANIMATIONS ───────────────────────────────────── */
 function initScrollAnimations() {
   const targets = document.querySelectorAll(
-    '.loadout-card, .featured-loadout-card, .achievement-card, .setting-card, .stat-bar-item, .spec-item'
+    '.loadout-card, .favorite-loadout-card, .achievement-card, .setting-card, .stat-bar-item, .spec-item, .clip-card, .testimonial-card, .season-card'
   );
 
   const observer = new IntersectionObserver(entries => {
@@ -563,6 +762,9 @@ document.addEventListener('DOMContentLoaded', () => {
     renderPcSpecs(data.pcSpecs);
     renderStats(data.stats);
     renderProfile(data.profile);
+    renderClips(data.clips);
+    renderTestimonials(data.testimonials);
+    renderSeasonStats(data.seasonStats);
     initLightbox();
     initNavScroll();
     initHamburger();

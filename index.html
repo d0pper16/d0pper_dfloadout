@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GUNSMITH DELTAFORCE by D0PPER. | Delta Force Loadout Hub</title>
+  <title>D0PPER. | Delta Force Loadout Hub</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -17,14 +17,16 @@
     <div class="nav-container">
       <a href="#home" class="nav-brand">
         <span class="brand-icon">⬡</span>
-        <span class="brand-text">GUNSMITH DELTAFORCE by D0PPER.</span>
+        <span class="brand-text">D0PPER.</span>
       </a>
       <ul class="nav-links" id="navLinks">
         <li><a href="#home" class="nav-link active">Home</a></li>
         <li><a href="#loadouts" class="nav-link">Loadouts</a></li>
         <li><a href="#settings" class="nav-link">Settings</a></li>
         <li><a href="#achievements" class="nav-link">Achievements</a></li>
-        <li><a href="#stats" class="nav-link">Stats</a></li>
+        <li><a href="#season-stats" class="nav-link">Stats</a></li>
+        <li><a href="#clips" class="nav-link">Clips</a></li>
+        <li><a href="#testimonials" class="nav-link">Testimonials</a></li>
         <li><a href="#about" class="nav-link">About</a></li>
         <li><a href="admin.html" class="nav-link nav-admin"><i class="fas fa-lock"></i> Admin</a></li>
       </ul>
@@ -44,8 +46,8 @@
     <div class="hero-grid"></div>
     <div class="hero-content">
       <div class="hero-badge">DELTA FORCE</div>
-      <h1 class="hero-title">GUNSMITH DELTAFORCE by D0PPER.</h1>
-      <p class="hero-sub">Tactical loadout codes, in-game settings, and player profile — all in one hub.</p>
+      <h1 class="hero-title">D0PPER.</h1>
+      <p class="hero-sub">player profile, loadout codes, ingame setting, social media, ...</p>
       <div class="hero-actions">
         <a href="#loadouts" class="btn btn-primary"><i class="fas fa-crosshairs"></i> View Loadouts</a>
         <a href="#settings" class="btn btn-outline"><i class="fas fa-sliders-h"></i> Settings</a>
@@ -73,9 +75,13 @@
       <div class="loadout-filter" id="loadoutFilter">
         <!-- Filled by JS -->
       </div>
-      <div class="loadout-grid" id="loadoutGrid">
-        <!-- Filled by JS -->
+      <!-- Favorite weapons header -->
+      <div id="favoriteSection" style="display:none">
+        <h3 class="favorite-section-title"><i class="fas fa-star"></i> Favorite Weapons</h3>
+        <div class="favorite-grid" id="favoriteGrid"></div>
       </div>
+      <!-- Regular grid -->
+      <div class="loadout-grid" id="loadoutGrid"></div>
     </div>
   </section>
 
@@ -149,15 +155,57 @@
     </div>
   </section>
 
+  <!-- CLIPS SECTION -->
+  <section class="section section-alt" id="clips">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">CLIPS</div>
+        <h2 class="section-title">🎬 Gameplay Clips</h2>
+        <p class="section-desc">Highlights and clutch moments on the battlefield.</p>
+      </div>
+      <div class="clips-grid" id="clipsGrid">
+        <!-- Filled by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS SECTION -->
+  <section class="section" id="testimonials">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">SHOUTOUTS</div>
+        <h2 class="section-title">💬 Testimonials</h2>
+        <p class="section-desc">Words from teammates and the community.</p>
+      </div>
+      <div class="testimonials-grid" id="testimonialsGrid">
+        <!-- Filled by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- SEASON STATS SECTION -->
+  <section class="section section-alt" id="season-stats">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">PERFORMANCE</div>
+        <h2 class="section-title">📊 Season Stats</h2>
+        <p class="section-desc">Performance breakdown by season.</p>
+      </div>
+      <div class="season-stats-grid" id="seasonStatsGrid">
+        <!-- Filled by JS -->
+      </div>
+    </div>
+  </section>
+
   <!-- FOOTER -->
   <footer class="footer">
     <div class="container">
       <div class="footer-brand">
         <span class="brand-icon">⬡</span>
-        <span>GUNSMITH DELTAFORCE by D0PPER.</span>
+        <span>D0PPER.</span>
       </div>
-      <p class="footer-text">Powered by GUNSMITH DELTAFORCE by D0PPER. &mdash; Delta Force Loadout Hub</p>
-      <p class="footer-copy">&copy; <span id="footerYear"></span> GUNSMITH DELTAFORCE by D0PPER. All rights reserved.</p>
+      <p class="footer-text">Powered by D0PPER. &mdash; Delta Force Loadout Hub</p>
+      <p class="footer-copy">&copy; <span id="footerYear"></span> D0PPER. All rights reserved.</p>
     </div>
   </footer>
 

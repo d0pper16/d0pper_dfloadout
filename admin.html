@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Panel | GUNSMITH DELTAFORCE by D0PPER.</title>
+  <title>Admin Panel | D0PPER.</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -18,7 +18,7 @@
     <div class="login-box">
       <div class="login-logo">
         <span class="brand-icon">⬡</span>
-        <h2>GUNSMITH DELTAFORCE by D0PPER.</h2>
+        <h2>D0PPER.</h2>
         <p>ADMIN ACCESS</p>
       </div>
       <form class="login-form" id="loginForm">
@@ -42,7 +42,7 @@
       <div class="nav-container">
         <a href="index.html" class="nav-brand">
           <span class="brand-icon">⬡</span>
-          <span class="brand-text">GUNSMITH DELTAFORCE by D0PPER.</span>
+          <span class="brand-text">D0PPER.</span>
           <span class="admin-badge">ADMIN</span>
         </a>
         <div class="nav-actions">
@@ -86,6 +86,18 @@
           <li><a href="#" class="admin-nav-link" data-section="stats">
             <i class="fas fa-chart-bar"></i> Player Stats
           </a></li>
+          <li><a href="#" class="admin-nav-link" data-section="clips">
+            <i class="fas fa-video"></i> Clips
+          </a></li>
+          <li><a href="#" class="admin-nav-link" data-section="testimonials">
+            <i class="fas fa-comment"></i> Testimonials
+          </a></li>
+          <li><a href="#" class="admin-nav-link" data-section="seasonStats">
+            <i class="fas fa-chart-bar"></i> Season Stats
+          </a></li>
+          <li><a href="#" class="admin-nav-link" data-section="counter">
+            <i class="fas fa-eye"></i> Visitor Counter
+          </a></li>
         </ul>
       </aside>
 
@@ -123,11 +135,11 @@
                   </datalist>
                 </div>
                 <div class="form-group form-group-center">
-                  <label>Featured</label>
+                  <label>Favorite</label>
                   <label class="toggle-label">
                     <input type="checkbox" id="loadoutFeatured" />
                     <span class="toggle-switch"></span>
-                    <span class="toggle-text">Mark as Featured Loadout</span>
+                    <span class="toggle-text">Mark as Favorite</span>
                   </label>
                 </div>
               </div>
@@ -429,6 +441,207 @@
                 <button type="button" class="btn btn-outline" id="addStatBtn"><i class="fas fa-plus"></i> Add Stat</button>
               </div>
             </form>
+          </div>
+        </div>
+
+        <!-- CLIPS SECTION -->
+        <div class="admin-section" id="section-clips">
+          <div class="admin-section-header">
+            <h2><i class="fas fa-video"></i> Clips Management</h2>
+          </div>
+          <div class="admin-card">
+            <h3 id="clipFormTitle">Add New Clip</h3>
+            <form id="clipForm">
+              <input type="hidden" id="clipId" />
+              <div class="form-group">
+                <label for="clipTitle">Title</label>
+                <input type="text" id="clipTitle" placeholder="e.g. Insane AWM Clutch" required />
+              </div>
+              <div class="form-group">
+                <label for="clipUrl">Video URL (YouTube or TikTok)</label>
+                <input type="url" id="clipUrl" placeholder="https://youtube.com/watch?v=..." required />
+                <small style="color:var(--text-muted)">Auto-converts to embed URL</small>
+              </div>
+              <div class="form-group">
+                <label for="clipDesc">Description (optional)</label>
+                <textarea id="clipDesc" rows="2" placeholder="Brief description..."></textarea>
+              </div>
+              <div class="form-group form-group-center">
+                <label>Visibility</label>
+                <label class="toggle-label">
+                  <input type="checkbox" id="clipVisible" checked />
+                  <span class="toggle-switch"></span>
+                  <span class="toggle-text">Visible on public site</span>
+                </label>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-save"></i> <span id="clipSubmitText">Add Clip</span>
+                </button>
+                <button type="button" class="btn btn-outline" id="clipCancelBtn" style="display:none">
+                  <i class="fas fa-times"></i> Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+          <div class="admin-card">
+            <h3>Existing Clips</h3>
+            <div id="clipList" class="admin-list"></div>
+          </div>
+        </div>
+
+        <!-- TESTIMONIALS SECTION -->
+        <div class="admin-section" id="section-testimonials">
+          <div class="admin-section-header">
+            <h2><i class="fas fa-comment"></i> Testimonials Management</h2>
+          </div>
+          <div class="admin-card">
+            <h3 id="testimonialFormTitle">Add New Testimonial</h3>
+            <form id="testimonialForm">
+              <input type="hidden" id="testimonialId" />
+              <div class="form-group">
+                <label for="testimonialName">Sender Name (always shown in full in admin)</label>
+                <input type="text" id="testimonialName" placeholder="e.g. John Doe" required />
+              </div>
+              <div class="form-group">
+                <label for="testimonialMessage">Message</label>
+                <textarea id="testimonialMessage" rows="3" placeholder="Their message or quote..." required></textarea>
+              </div>
+              <div class="form-row">
+                <div class="form-group form-group-center">
+                  <label>Censor Name on Public Site</label>
+                  <label class="toggle-label">
+                    <input type="checkbox" id="testimonialCensored" />
+                    <span class="toggle-switch"></span>
+                    <span class="toggle-text">Censor name (e.g. J**n D*e)</span>
+                  </label>
+                </div>
+                <div class="form-group form-group-center">
+                  <label>Visibility</label>
+                  <label class="toggle-label">
+                    <input type="checkbox" id="testimonialVisible" checked />
+                    <span class="toggle-switch"></span>
+                    <span class="toggle-text">Visible on public site</span>
+                  </label>
+                </div>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-save"></i> <span id="testimonialSubmitText">Add Testimonial</span>
+                </button>
+                <button type="button" class="btn btn-outline" id="testimonialCancelBtn" style="display:none">
+                  <i class="fas fa-times"></i> Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+          <div class="admin-card">
+            <h3>Existing Testimonials</h3>
+            <div id="testimonialList" class="admin-list"></div>
+          </div>
+        </div>
+
+        <!-- SEASON STATS SECTION -->
+        <div class="admin-section" id="section-seasonStats">
+          <div class="admin-section-header">
+            <h2><i class="fas fa-chart-bar"></i> Season Stats Management</h2>
+          </div>
+          <div class="admin-card">
+            <h3 id="seasonFormTitle">Add New Season</h3>
+            <form id="seasonForm">
+              <input type="hidden" id="seasonId" />
+              <div class="form-group">
+                <label for="seasonName">Season Name</label>
+                <input type="text" id="seasonName" placeholder="e.g. Season 1" required />
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="seasonAdKpm">A/D KPM</label>
+                  <input type="number" id="seasonAdKpm" step="0.01" min="0" placeholder="e.g. 2.1" />
+                </div>
+                <div class="form-group">
+                  <label for="seasonAdSpm">A/D SPM</label>
+                  <input type="number" id="seasonAdSpm" step="1" min="0" placeholder="e.g. 155" />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="seasonVuKpm">Victory Unite KPM</label>
+                  <input type="number" id="seasonVuKpm" step="0.01" min="0" placeholder="e.g. 2.8" />
+                </div>
+                <div class="form-group">
+                  <label for="seasonVuSpm">Victory Unite SPM</label>
+                  <input type="number" id="seasonVuSpm" step="1" min="0" placeholder="e.g. 190" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Radar Stats (0–100)</label>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="radarShooting" class="label-sm">Shooting</label>
+                    <input type="number" id="radarShooting" min="0" max="100" placeholder="75" />
+                  </div>
+                  <div class="form-group">
+                    <label for="radarSurvival" class="label-sm">Survival</label>
+                    <input type="number" id="radarSurvival" min="0" max="100" placeholder="65" />
+                  </div>
+                  <div class="form-group">
+                    <label for="radarCoop" class="label-sm">Co-op</label>
+                    <input type="number" id="radarCoop" min="0" max="100" placeholder="55" />
+                  </div>
+                  <div class="form-group">
+                    <label for="radarObjective" class="label-sm">Objective</label>
+                    <input type="number" id="radarObjective" min="0" max="100" placeholder="70" />
+                  </div>
+                  <div class="form-group">
+                    <label for="radarVehicle" class="label-sm">Vehicle</label>
+                    <input type="number" id="radarVehicle" min="0" max="100" placeholder="40" />
+                  </div>
+                </div>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-save"></i> <span id="seasonSubmitText">Add Season</span>
+                </button>
+                <button type="button" class="btn btn-outline" id="seasonCancelBtn" style="display:none">
+                  <i class="fas fa-times"></i> Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+          <div class="admin-card">
+            <h3>Existing Seasons</h3>
+            <div id="seasonList" class="admin-list"></div>
+          </div>
+        </div>
+
+        <!-- VISITOR COUNTER SECTION -->
+        <div class="admin-section" id="section-counter">
+          <div class="admin-section-header">
+            <h2><i class="fas fa-eye"></i> Visitor Counter</h2>
+          </div>
+          <div class="admin-card">
+            <p>Manage visitor counter display.</p>
+            <div class="form-group">
+              <label>Current Displayed Count (read-only)</label>
+              <input type="text" id="counterDisplayed" readonly />
+            </div>
+            <div class="form-group">
+              <label for="counterBase">Base Count (admin set)</label>
+              <input type="number" id="counterBase" min="0" placeholder="e.g. 1000" />
+            </div>
+            <div class="form-group">
+              <label>Real Visits (read-only)</label>
+              <input type="text" id="counterRealVisits" readonly />
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn btn-primary" id="saveCounterBtn">
+                <i class="fas fa-save"></i> Save Base Count
+              </button>
+              <button type="button" class="btn btn-danger btn-sm" id="resetVisitsBtn">
+                <i class="fas fa-redo"></i> Reset Real Visits
+              </button>
+            </div>
           </div>
         </div>
 

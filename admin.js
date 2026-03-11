@@ -1,5 +1,5 @@
 /* ============================================================
-   admin.js — GUNSMITH DELTAFORCE by D0PPER. Admin Panel Logic
+   admin.js — D0PPER. Admin Panel Logic
    ============================================================ */
 
 'use strict';
@@ -121,7 +121,7 @@ function initLoadoutManager() {
 
     list.innerHTML = loadouts.map(l => {
       const catTag  = l.category ? `<span class="admin-tag">${window.dfApp.escHtml(l.category)}</span>` : '';
-      const featTag = l.featured  ? `<span class="admin-tag featured-tag">⭐ Featured</span>` : '';
+      const featTag = l.featured  ? `<span class="admin-tag featured-tag">⭐ Favorite</span>` : '';
       return `
         <div class="admin-list-item" data-id="${l.id}">
           <div class="admin-list-item-info">
@@ -190,11 +190,6 @@ function initLoadoutManager() {
 
     let loadouts = window.dfApp.getData('loadouts') || window.dfApp.DEFAULT_DATA.loadouts;
     const existingId = idField.value;
-
-    /* Only one featured at a time */
-    if (featured) {
-      loadouts = loadouts.map(l => ({ ...l, featured: false }));
-    }
 
     if (existingId) {
       loadouts = loadouts.map(l => l.id === existingId ? { ...l, title, code, category, featured } : l);
@@ -614,6 +609,358 @@ function initStatsManager() {
   loadStats();
 }
 
+/* ── CLIP MANAGEMENT ─────────────────────────────────────── */
+function initClipManager() {
+  const form = document.getElementById('clipForm');
+  const cancelBtn = document.getElementById('clipCancelBtn');
+  const idField = document.getElementById('clipId');
+  if (!form) return;
+
+  function renderList() {
+    const clips = window.dfApp.getData('clips') || [];
+    const list = document.getElementById('clipList');
+    if (!list) return;
+    if (clips.length === 0) {
+      list.innerHTML = '<p style="color:var(--text-muted);font-size:.9rem;text-align:center;padding:1rem;">No clips yet.</p>';
+      return;
+    }
+    list.innerHTML = clips.map(c => {
+      const visTag = c.visible
+        ? '<span class="admin-tag" style="background:rgba(15,247,150,.15);color:#0ff796">👁 Visible</span>'
+        : '<span class="admin-tag" style="background:rgba(255,80,80,.15);color:#f87171">🚫 Hidden</span>';
+      return `
+        <div class="admin-list-item" data-id="${c.id}">
+          <div class="admin-list-item-info">
+            <div class="admin-list-item-title">${window.dfApp.escHtml(c.title)} ${visTag}</div>
+            <div class="admin-list-item-sub">${window.dfApp.escHtml(c.videoUrl)}</div>
+          </div>
+          <div class="admin-list-item-actions">
+            <button class="btn btn-outline btn-sm edit-clip-btn" data-id="${c.id}"><i class="fas fa-edit"></i> Edit</button>
+            <button class="btn btn-danger btn-sm delete-clip-btn" data-id="${c.id}"><i class="fas fa-trash"></i></button>
+          </div>
+        </div>`;
+    }).join('');
+    list.querySelectorAll('.edit-clip-btn').forEach(btn => btn.addEventListener('click', () => editClip(btn.dataset.id)));
+    list.querySelectorAll('.delete-clip-btn').forEach(btn => btn.addEventListener('click', () => deleteClip(btn.dataset.id)));
+  }
+
+  function resetForm() {
+    form.reset();
+    idField.value = '';
+    document.getElementById('clipFormTitle').textContent = 'Add New Clip';
+    document.getElementById('clipSubmitText').textContent = 'Add Clip';
+    cancelBtn.style.display = 'none';
+    document.getElementById('clipVisible').checked = true;
+  }
+
+  function editClip(id) {
+    const clips = window.dfApp.getData('clips') || [];
+    const item = clips.find(c => c.id === id);
+    if (!item) return;
+    idField.value = id;
+    document.getElementById('clipTitle').value = item.title || '';
+    document.getElementById('clipUrl').value = item.videoUrl || '';
+    document.getElementById('clipDesc').value = item.description || '';
+    document.getElementById('clipVisible').checked = !!item.visible;
+    document.getElementById('clipFormTitle').textContent = 'Edit Clip';
+    document.getElementById('clipSubmitText').textContent = 'Update Clip';
+    cancelBtn.style.display = 'inline-flex';
+    document.getElementById('section-clips').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function deleteClip(id) {
+    if (!confirm('Delete this clip?')) return;
+    let clips = window.dfApp.getData('clips') || [];
+    clips = clips.filter(c => c.id !== id);
+    saveData('clips', clips);
+    renderList();
+    showAdminToast('Clip deleted.');
+  }
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const title = document.getElementById('clipTitle').value.trim();
+    const videoUrl = document.getElementById('clipUrl').value.trim();
+    const description = document.getElementById('clipDesc').value.trim();
+    const visible = document.getElementById('clipVisible').checked;
+    if (!title || !videoUrl) return;
+    let clips = window.dfApp.getData('clips') || [];
+    const existingId = idField.value;
+    if (existingId) {
+      clips = clips.map(c => c.id === existingId ? { ...c, title, videoUrl, description, visible } : c);
+      showAdminToast('Clip updated!');
+    } else {
+      clips.push({ id: generateId(), title, videoUrl, description, visible });
+      showAdminToast('Clip added!');
+    }
+    saveData('clips', clips);
+    renderList();
+    resetForm();
+  });
+
+  cancelBtn.addEventListener('click', resetForm);
+  renderList();
+}
+
+/* ── TESTIMONIAL MANAGEMENT ──────────────────────────────── */
+function initTestimonialManager() {
+  const form = document.getElementById('testimonialForm');
+  const cancelBtn = document.getElementById('testimonialCancelBtn');
+  const idField = document.getElementById('testimonialId');
+  if (!form) return;
+
+  function renderList() {
+    const testimonials = window.dfApp.getData('testimonials') || [];
+    const list = document.getElementById('testimonialList');
+    if (!list) return;
+    if (testimonials.length === 0) {
+      list.innerHTML = '<p style="color:var(--text-muted);font-size:.9rem;text-align:center;padding:1rem;">No testimonials yet.</p>';
+      return;
+    }
+    list.innerHTML = testimonials.map(t => {
+      const visTag = t.visible
+        ? '<span class="admin-tag" style="background:rgba(15,247,150,.15);color:#0ff796">👁 Visible</span>'
+        : '<span class="admin-tag" style="background:rgba(255,80,80,.15);color:#f87171">🚫 Hidden</span>';
+      const censTag = t.censored
+        ? '<span class="admin-tag" style="background:rgba(255,200,0,.15);color:#fbbf24">🔒 Censored</span>'
+        : '';
+      return `
+        <div class="admin-list-item" data-id="${t.id}">
+          <div class="admin-list-item-info">
+            <div class="admin-list-item-title">${window.dfApp.escHtml(t.senderName)} ${visTag} ${censTag}</div>
+            <div class="admin-list-item-sub">${window.dfApp.escHtml(t.message)}</div>
+          </div>
+          <div class="admin-list-item-actions">
+            <button class="btn btn-outline btn-sm edit-testimonial-btn" data-id="${t.id}"><i class="fas fa-edit"></i> Edit</button>
+            <button class="btn btn-danger btn-sm delete-testimonial-btn" data-id="${t.id}"><i class="fas fa-trash"></i></button>
+          </div>
+        </div>`;
+    }).join('');
+    list.querySelectorAll('.edit-testimonial-btn').forEach(btn => btn.addEventListener('click', () => editTestimonial(btn.dataset.id)));
+    list.querySelectorAll('.delete-testimonial-btn').forEach(btn => btn.addEventListener('click', () => deleteTestimonial(btn.dataset.id)));
+  }
+
+  function resetForm() {
+    form.reset();
+    idField.value = '';
+    document.getElementById('testimonialFormTitle').textContent = 'Add New Testimonial';
+    document.getElementById('testimonialSubmitText').textContent = 'Add Testimonial';
+    cancelBtn.style.display = 'none';
+    document.getElementById('testimonialVisible').checked = true;
+    document.getElementById('testimonialCensored').checked = false;
+  }
+
+  function editTestimonial(id) {
+    const testimonials = window.dfApp.getData('testimonials') || [];
+    const item = testimonials.find(t => t.id === id);
+    if (!item) return;
+    idField.value = id;
+    document.getElementById('testimonialName').value = item.senderName || '';
+    document.getElementById('testimonialMessage').value = item.message || '';
+    document.getElementById('testimonialCensored').checked = !!item.censored;
+    document.getElementById('testimonialVisible').checked = !!item.visible;
+    document.getElementById('testimonialFormTitle').textContent = 'Edit Testimonial';
+    document.getElementById('testimonialSubmitText').textContent = 'Update Testimonial';
+    cancelBtn.style.display = 'inline-flex';
+    document.getElementById('section-testimonials').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function deleteTestimonial(id) {
+    if (!confirm('Delete this testimonial?')) return;
+    let testimonials = window.dfApp.getData('testimonials') || [];
+    testimonials = testimonials.filter(t => t.id !== id);
+    saveData('testimonials', testimonials);
+    renderList();
+    showAdminToast('Testimonial deleted.');
+  }
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const senderName = document.getElementById('testimonialName').value.trim();
+    const message = document.getElementById('testimonialMessage').value.trim();
+    const censored = document.getElementById('testimonialCensored').checked;
+    const visible = document.getElementById('testimonialVisible').checked;
+    if (!senderName || !message) return;
+    let testimonials = window.dfApp.getData('testimonials') || [];
+    const existingId = idField.value;
+    if (existingId) {
+      testimonials = testimonials.map(t => t.id === existingId ? { ...t, senderName, message, censored, visible } : t);
+      showAdminToast('Testimonial updated!');
+    } else {
+      testimonials.push({ id: generateId(), senderName, message, censored, visible });
+      showAdminToast('Testimonial added!');
+    }
+    saveData('testimonials', testimonials);
+    renderList();
+    resetForm();
+  });
+
+  cancelBtn.addEventListener('click', resetForm);
+  renderList();
+}
+
+/* ── SEASON STATS MANAGEMENT ─────────────────────────────── */
+function initSeasonStatsManager() {
+  const form = document.getElementById('seasonForm');
+  const cancelBtn = document.getElementById('seasonCancelBtn');
+  const idField = document.getElementById('seasonId');
+  if (!form) return;
+
+  function renderList() {
+    const seasons = window.dfApp.getData('seasonStats') || window.dfApp.DEFAULT_DATA.seasonStats;
+    const list = document.getElementById('seasonList');
+    if (!list) return;
+    if (seasons.length === 0) {
+      list.innerHTML = '<p style="color:var(--text-muted);font-size:.9rem;text-align:center;padding:1rem;">No seasons yet.</p>';
+      return;
+    }
+    list.innerHTML = seasons.map(s => {
+      const ad = s.ad || {};
+      const vu = s.victoryUnite || {};
+      return `
+        <div class="admin-list-item" data-id="${s.id}">
+          <div class="admin-list-item-info">
+            <div class="admin-list-item-title">${window.dfApp.escHtml(s.season)}</div>
+            <div class="admin-list-item-sub">A/D: KPM ${ad.kpm ?? '—'} SPM ${ad.spm ?? '—'} | VU: KPM ${vu.kpm ?? '—'} SPM ${vu.spm ?? '—'}</div>
+          </div>
+          <div class="admin-list-item-actions">
+            <button class="btn btn-outline btn-sm edit-season-btn" data-id="${s.id}"><i class="fas fa-edit"></i> Edit</button>
+            <button class="btn btn-danger btn-sm delete-season-btn" data-id="${s.id}"><i class="fas fa-trash"></i></button>
+          </div>
+        </div>`;
+    }).join('');
+    list.querySelectorAll('.edit-season-btn').forEach(btn => btn.addEventListener('click', () => editSeason(btn.dataset.id)));
+    list.querySelectorAll('.delete-season-btn').forEach(btn => btn.addEventListener('click', () => deleteSeason(btn.dataset.id)));
+  }
+
+  function resetForm() {
+    form.reset();
+    idField.value = '';
+    document.getElementById('seasonFormTitle').textContent = 'Add New Season';
+    document.getElementById('seasonSubmitText').textContent = 'Add Season';
+    cancelBtn.style.display = 'none';
+  }
+
+  function editSeason(id) {
+    const seasons = window.dfApp.getData('seasonStats') || window.dfApp.DEFAULT_DATA.seasonStats;
+    const item = seasons.find(s => s.id === id);
+    if (!item) return;
+    idField.value = id;
+    document.getElementById('seasonName').value = item.season || '';
+    const ad = item.ad || {};
+    const vu = item.victoryUnite || {};
+    const radar = item.radar || {};
+    document.getElementById('seasonAdKpm').value = ad.kpm ?? '';
+    document.getElementById('seasonAdSpm').value = ad.spm ?? '';
+    document.getElementById('seasonVuKpm').value = vu.kpm ?? '';
+    document.getElementById('seasonVuSpm').value = vu.spm ?? '';
+    document.getElementById('radarShooting').value = radar.shooting ?? '';
+    document.getElementById('radarSurvival').value = radar.survival ?? '';
+    document.getElementById('radarCoop').value = radar.coop ?? '';
+    document.getElementById('radarObjective').value = radar.objective ?? '';
+    document.getElementById('radarVehicle').value = radar.vehicle ?? '';
+    document.getElementById('seasonFormTitle').textContent = 'Edit Season';
+    document.getElementById('seasonSubmitText').textContent = 'Update Season';
+    cancelBtn.style.display = 'inline-flex';
+    document.getElementById('section-seasonStats').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function deleteSeason(id) {
+    if (!confirm('Delete this season?')) return;
+    let seasons = window.dfApp.getData('seasonStats') || window.dfApp.DEFAULT_DATA.seasonStats;
+    seasons = seasons.filter(s => s.id !== id);
+    saveData('seasonStats', seasons);
+    renderList();
+    showAdminToast('Season deleted.');
+  }
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const season = document.getElementById('seasonName').value.trim();
+    if (!season) return;
+    const ad = {
+      kpm: parseFloat(document.getElementById('seasonAdKpm').value) || 0,
+      spm: parseFloat(document.getElementById('seasonAdSpm').value) || 0
+    };
+    const victoryUnite = {
+      kpm: parseFloat(document.getElementById('seasonVuKpm').value) || 0,
+      spm: parseFloat(document.getElementById('seasonVuSpm').value) || 0
+    };
+    const radar = {
+      shooting:  Math.min(100, Math.max(0, parseInt(document.getElementById('radarShooting').value) || 0)),
+      survival:  Math.min(100, Math.max(0, parseInt(document.getElementById('radarSurvival').value) || 0)),
+      coop:      Math.min(100, Math.max(0, parseInt(document.getElementById('radarCoop').value) || 0)),
+      objective: Math.min(100, Math.max(0, parseInt(document.getElementById('radarObjective').value) || 0)),
+      vehicle:   Math.min(100, Math.max(0, parseInt(document.getElementById('radarVehicle').value) || 0))
+    };
+    let seasons = window.dfApp.getData('seasonStats') || window.dfApp.DEFAULT_DATA.seasonStats;
+    const existingId = idField.value;
+    if (existingId) {
+      seasons = seasons.map(s => s.id === existingId ? { ...s, season, ad, victoryUnite, radar } : s);
+      showAdminToast('Season updated!');
+    } else {
+      seasons.push({ id: generateId(), season, ad, victoryUnite, radar });
+      showAdminToast('Season added!');
+    }
+    saveData('seasonStats', seasons);
+    renderList();
+    resetForm();
+  });
+
+  cancelBtn.addEventListener('click', resetForm);
+  renderList();
+}
+
+/* ── VISITOR COUNTER MANAGEMENT ──────────────────────────── */
+function initCounterManager() {
+  const baseInput = document.getElementById('counterBase');
+  const displayedEl = document.getElementById('counterDisplayed');
+  const realVisitsEl = document.getElementById('counterRealVisits');
+  const saveBtn = document.getElementById('saveCounterBtn');
+  const resetBtn = document.getElementById('resetVisitsBtn');
+  if (!baseInput) return;
+
+  function loadCounter() {
+    let viewsData;
+    try { viewsData = JSON.parse(localStorage.getItem('dfloadout_views') || 'null'); } catch(e) { viewsData = null; }
+    if (!viewsData || typeof viewsData !== 'object') {
+      viewsData = { baseCount: 0, realVisits: 0 };
+    }
+    const base = viewsData.baseCount || 0;
+    const real = viewsData.realVisits || 0;
+    baseInput.value = base;
+    if (realVisitsEl) realVisitsEl.value = real.toLocaleString();
+    if (displayedEl) displayedEl.value = (base + real).toLocaleString();
+  }
+
+  if (saveBtn) {
+    saveBtn.addEventListener('click', () => {
+      let viewsData;
+      try { viewsData = JSON.parse(localStorage.getItem('dfloadout_views') || 'null'); } catch(e) { viewsData = null; }
+      if (!viewsData || typeof viewsData !== 'object') viewsData = { baseCount: 0, realVisits: 0 };
+      viewsData.baseCount = Math.max(0, parseInt(baseInput.value, 10) || 0);
+      localStorage.setItem('dfloadout_views', JSON.stringify(viewsData));
+      loadCounter();
+      showAdminToast('Base count saved!');
+    });
+  }
+
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      if (!confirm('Reset real visits to 0?')) return;
+      let viewsData;
+      try { viewsData = JSON.parse(localStorage.getItem('dfloadout_views') || 'null'); } catch(e) { viewsData = null; }
+      if (!viewsData || typeof viewsData !== 'object') viewsData = { baseCount: 0, realVisits: 0 };
+      viewsData.realVisits = 0;
+      localStorage.setItem('dfloadout_views', JSON.stringify(viewsData));
+      loadCounter();
+      showAdminToast('Real visits reset to 0.');
+    });
+  }
+
+  loadCounter();
+}
+
 /* ── INIT ALL ────────────────────────────────────────────── */
 function initAdminApp() {
   initSidebarNav();
@@ -624,6 +971,10 @@ function initAdminApp() {
   initProfileManager();
   initSocialManager();
   initStatsManager();
+  initClipManager();
+  initTestimonialManager();
+  initSeasonStatsManager();
+  initCounterManager();
 }
 
 /* ── BOOT ────────────────────────────────────────────────── */
