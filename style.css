@@ -1731,7 +1731,7 @@ ul { list-style: none; }
 @media (max-width: 768px) {
   .visitor-counter {
     top: auto;
-    bottom: 5rem;
+    bottom: 5rem; /* clear mobile nav bar / toast area */
     right: 1rem;
   }
 

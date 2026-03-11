@@ -711,8 +711,12 @@ function initPublicTestimonialForm() {
 }
 
 /* ── RENDER SEASON STATS ─────────────────────────────────── */
+const RADAR_CENTER_X  = 150; /* SVG center X in 300×300 viewBox */
+const RADAR_CENTER_Y  = 150; /* SVG center Y */
+const RADAR_MAX_RADIUS = 120; /* max pentagon radius (px) */
+
 function buildRadarSVG(radar) {
-  const cx = 150, cy = 150, maxR = 120;
+  const cx = RADAR_CENTER_X, cy = RADAR_CENTER_Y, maxR = RADAR_MAX_RADIUS;
   const axes = [
     { key: 'shooting',  label: 'Shooting',  angle: 90 },
     { key: 'survival',  label: 'Survival',  angle: 18 },
