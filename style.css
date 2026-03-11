@@ -357,44 +357,50 @@ ul { list-style: none; }
 }
 
 /* ── VISITOR COUNTER ─────────────────────────────────────── */
-.visitor-counter {
+/* ── VISITOR COUNTER (fixed top-right) ───────────────────── */
+.visitor-counter-fixed {
+  position: fixed;
+  top: 70px;
+  right: 1.25rem;
+  z-index: 999;
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.35rem 1rem;
-  background: rgba(15, 247, 150, 0.08);
-  border: 1px solid rgba(15, 247, 150, 0.3);
+  padding: 0.3rem 0.85rem;
+  background: rgba(15, 247, 150, 0.1);
+  border: 1px solid rgba(15, 247, 150, 0.35);
   border-radius: 20px;
   font-family: 'Rajdhani', sans-serif;
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   color: var(--accent2);
-  margin-bottom: 1rem;
+  backdrop-filter: blur(8px);
+  pointer-events: none;
 }
 
-.visitor-counter i { font-size: 0.85rem; }
+.visitor-counter-fixed i { font-size: 0.78rem; }
 
 /* ── SOCIAL LINKS ────────────────────────────────────────── */
 .social-links {
   display: flex;
-  gap: 0.75rem;
+  gap: 1rem;
   justify-content: center;
   flex-wrap: wrap;
   margin-bottom: 0.5rem;
 }
 
 .social-btn {
-  width: 42px;
-  height: 42px;
+  width: 58px;
+  height: 58px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 12px;
   background: rgba(26, 31, 26, 0.6);
   color: var(--text-secondary);
-  font-size: 1.05rem;
+  font-size: 1.5rem;
   transition: all 0.2s;
   backdrop-filter: blur(6px);
 }
@@ -648,6 +654,47 @@ ul { list-style: none; }
   word-break: break-all;
   margin-bottom: 1rem;
   line-height: 1.5;
+}
+
+/* ── WEAPON CODES LIST ───────────────────────────────────── */
+.weapon-codes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 0.75rem;
+}
+
+.weapon-code-entry {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.65rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.weapon-code-name {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--accent2);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.weapon-code-value {
+  font-family: 'Courier New', monospace;
+  font-size: 0.82rem;
+  color: var(--accent);
+  word-break: break-all;
+  line-height: 1.4;
+}
+
+.weapon-code-entry .copy-btn {
+  margin-top: 0.3rem;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.78rem;
 }
 
 .copy-btn {
@@ -973,15 +1020,34 @@ ul { list-style: none; }
 
 /* ── PC SPECS ────────────────────────────────────────────── */
 .specs-card {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.specs-subsection {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 12px;
-  padding: 2rem;
-  max-width: 900px;
-  margin: 0 auto;
+  padding: 1.5rem 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.specs-subtitle {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent2);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.specs-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
 }
 
 .spec-item {
@@ -1031,6 +1097,20 @@ ul { list-style: none; }
   font-size: 1rem;
   font-weight: 600;
   color: var(--text-primary);
+}
+
+.spec-value-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.spec-value-list li {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.5;
 }
 
 /* ── STATS BARS ──────────────────────────────────────────── */
@@ -1165,26 +1245,17 @@ ul { list-style: none; }
 .footer {
   background: var(--bg-secondary);
   border-top: 1px solid var(--border-color);
-  padding: 2.5rem 0;
+  padding: 2rem 0;
   text-align: center;
 }
 
-.footer-brand {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
+.footer-text {
   font-family: 'Rajdhani', sans-serif;
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--accent);
-  margin-bottom: 0.5rem;
-}
-
-.footer-text {
-  font-size: 0.85rem;
-  color: var(--text-muted);
   margin-bottom: 0.25rem;
+  letter-spacing: 0.05em;
 }
 
 .footer-copy {
@@ -1392,6 +1463,59 @@ ul { list-style: none; }
 }
 
 /* ── TESTIMONIALS SECTION ────────────────────────────────── */
+.testimonial-form-public {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.75rem 2rem;
+  max-width: 600px;
+  margin: 0 auto 2.5rem;
+}
+
+.testimonial-form-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent2);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 1.25rem;
+}
+
+.testimonial-form-public .form-group {
+  margin-bottom: 1rem;
+}
+
+.testimonial-form-public label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.4rem;
+}
+
+.testimonial-form-public input,
+.testimonial-form-public textarea {
+  width: 100%;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 0.6rem 0.9rem;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-family: 'Inter', sans-serif;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.testimonial-form-public input:focus,
+.testimonial-form-public textarea:focus {
+  outline: none;
+  border-color: var(--accent2);
+}
+
 .testimonials-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));

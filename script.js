@@ -7,9 +7,35 @@
 /* ── DEFAULT DATA ────────────────────────────────────────── */
 const DEFAULT_DATA = {
   loadouts: [
-    { id: 'load-001', title: 'M4A1 CQB Build',    code: 'DF-M4A1-CQB-4xX9-K2L8-R7M3', category: 'Assault', featured: false },
-    { id: 'load-002', title: 'AWM Sniper Setup',   code: 'DF-AWM-SNP-8xZ4-P1Q6-T9N2',  category: 'Sniper',  featured: false },
-    { id: 'load-003', title: 'CI-19 All-Rounder',  code: 'DF-CI19-ALL-3xV7-B5W1-S4C6', category: 'SMG',     featured: false }
+    {
+      id: 'load-001',
+      weaponName: 'M4A1',
+      category: 'Assault',
+      featured: false,
+      codes: [
+        { name: 'CQB Build',    code: 'DF-M4A1-CQB-4xX9-K2L8-R7M3' },
+        { name: 'Long Range',   code: 'DF-M4A1-LR-7xA2-N5P8-Q1S4'  }
+      ]
+    },
+    {
+      id: 'load-002',
+      weaponName: 'AWM',
+      category: 'Sniper',
+      featured: false,
+      codes: [
+        { name: 'Quick Scope',  code: 'DF-AWM-QS-8xZ4-P1Q6-T9N2'   }
+      ]
+    },
+    {
+      id: 'load-003',
+      weaponName: 'CI-19',
+      category: 'SMG',
+      featured: false,
+      codes: [
+        { name: 'Rush Build',   code: 'DF-CI19-RSH-3xV7-B5W1-S4C6' },
+        { name: 'Stealth Build',code: 'DF-CI19-STL-6xD8-F2J4-L7H9' }
+      ]
+    }
   ],
   settings: {
     resolution:  '1920x1080',
@@ -42,18 +68,17 @@ const DEFAULT_DATA = {
     }
   ],
   pcSpecs: {
-    cpu:      'Intel Core i7-13700K',
-    gpu:      'NVIDIA GeForce RTX 4070',
-    ram:      '32GB DDR5 6000MHz',
-    monitor:  '27" 1080p 165Hz',
-    mouse:    'Logitech G Pro X Superlight',
-    keyboard: 'Corsair K95 RGB Platinum',
-    headset:  'HyperX Cloud II Wireless'
+    cpu:       'Intel Core i7-13700K',
+    gpu:       'NVIDIA GeForce RTX 4070',
+    ram:       '32GB DDR5 6000MHz',
+    monitor:   '27" 1080p 165Hz',
+    mouse:     'Logitech G Pro X Superlight',
+    keyboard:  'Corsair K95 RGB Platinum',
+    headset:   'HyperX Cloud II Wireless',
+    mousepad:  'Artisan Hien FX XL'
   },
   profile: {
     nickname:  'd0pper',
-    playerId:  'DF-882741',
-    rank:      'Elite IV',
     region:    'SEA',
     playstyle: 'Aggressive Assault',
     bio:       'Delta Force veteran focused on aggressive entry tactics and tight-quarters combat. Specializing in CQB loadouts and high-pressure engagements. Always pushing.'
@@ -203,22 +228,32 @@ function initVisitorCounter() {
   el.textContent = total.toLocaleString();
 }
 
+/* ── URL SANITIZER ───────────────────────────────────────── */
+function sanitizeUrl(url) {
+  if (!url || url === '#') return '#';
+  try {
+    const parsed = new URL(url);
+    if (['https:', 'http:', 'mailto:', 'tel:'].includes(parsed.protocol)) return url;
+  } catch (e) { /* invalid URL */ }
+  return '#';
+}
+
 /* ── RENDER SOCIAL LINKS ─────────────────────────────────── */
 function renderSocialLinks(socialLinks) {
   const el = document.getElementById('socialLinks');
   if (!el) return;
 
   const links = [
-    { key: 'youtube',   icon: 'fab fa-youtube',  label: 'YouTube'   },
-    { key: 'tiktok',    icon: 'fab fa-tiktok',   label: 'TikTok'    },
-    { key: 'sociabuzz', icon: 'fas fa-link',      label: 'Sociabuzz' },
-    { key: 'whatsapp',  icon: 'fab fa-whatsapp',  label: 'WhatsApp'  },
-    { key: 'email',     icon: 'fas fa-envelope',  label: 'Email'     }
+    { key: 'youtube',   icon: 'fab fa-youtube',  label: 'YouTube'            },
+    { key: 'tiktok',    icon: 'fab fa-tiktok',   label: 'TikTok'             },
+    { key: 'sociabuzz', icon: 'fas fa-link',      label: 'Sociabuzz'          },
+    { key: 'whatsapp',  icon: 'fab fa-whatsapp',  label: 'WhatsApp Business'  },
+    { key: 'email',     icon: 'fas fa-envelope',  label: 'Email'              }
   ];
 
   el.innerHTML = links.map(l => {
-    const href = socialLinks[l.key] || '#';
-    return `<a href="${escHtml(href)}" class="social-btn social-btn-${l.key}" title="${l.label}" target="_blank" rel="noopener noreferrer">
+    const href = sanitizeUrl(socialLinks[l.key]);
+    return `<a href="${escHtml(href)}" class="social-btn social-btn-${l.key}" title="${escHtml(l.label)}" target="_blank" rel="noopener noreferrer">
       <i class="${l.icon}"></i>
     </a>`;
   }).join('');
@@ -240,14 +275,22 @@ function renderHeroStats(data) {
       <div class="hero-stat-label">Achievements</div>
     </div>
     <div class="hero-stat">
-      <div class="hero-stat-value">${escHtml(data.profile.rank || '—')}</div>
-      <div class="hero-stat-label">Rank</div>
-    </div>
-    <div class="hero-stat">
       <div class="hero-stat-value">${escHtml(data.profile.region || '—')}</div>
       <div class="hero-stat-label">Region</div>
     </div>
   `;
+}
+
+/* ── RENDER HERO TAGLINE ─────────────────────────────────── */
+function renderHeroTagline(loadouts) {
+  const el = document.getElementById('heroSub');
+  if (!el) return;
+  const categories = [...new Set((loadouts || []).map(l => l.category).filter(Boolean))];
+  if (categories.length > 0) {
+    el.textContent = categories.join(', ') + ', ...';
+  } else {
+    el.textContent = 'loadout codes, settings, achievements, ...';
+  }
 }
 
 /* ── RENDER LOADOUTS ─────────────────────────────────────── */
@@ -263,7 +306,7 @@ function renderLoadouts(loadouts) {
     if (favSection) favSection.style.display = 'none';
     grid.innerHTML = `
       <div class="empty-state">
-        <i class="fas fa-crosshairs"></i>
+        <i class="fas fa-gun"></i>
         <p>No loadouts added yet.<br>Visit the admin panel to add loadout codes.</p>
       </div>`;
     return;
@@ -293,6 +336,21 @@ function renderLoadouts(loadouts) {
     });
   }
 
+  /* Helper: render codes list for a weapon */
+  function buildCodesHtml(weapon) {
+    const codes = Array.isArray(weapon.codes) ? weapon.codes : [];
+    if (codes.length === 0) return '';
+    return codes.map(c => `
+      <div class="weapon-code-entry">
+        <div class="weapon-code-name">${escHtml(c.name || 'Code')}</div>
+        <div class="weapon-code-value">${escHtml(c.code)}</div>
+        <button class="copy-btn" data-code="${escHtml(c.code)}">
+          <i class="fas fa-copy"></i> Copy
+        </button>
+      </div>
+    `).join('');
+  }
+
   /* Render favorites */
   const favorites    = loadouts.filter(l => l.featured);
   const nonFavorites = loadouts.filter(l => !l.featured);
@@ -306,15 +364,13 @@ function renderLoadouts(loadouts) {
           <div class="favorite-loadout-card" data-category="${escHtml(l.category || '')}">
             <div class="favorite-badge">⭐ FAVORITE</div>
             <div class="loadout-card-header">
-              <div class="loadout-icon"><i class="fas fa-crosshairs"></i></div>
-              <div class="loadout-title">${escHtml(l.title)}</div>
+              <div class="loadout-icon"><i class="fas fa-gun"></i></div>
+              <div class="loadout-title">${escHtml(l.weaponName || l.title || 'Weapon')}</div>
               ${catTag}
             </div>
-            <div class="loadout-code-label">Weapon Code</div>
-            <div class="loadout-code">${escHtml(l.code)}</div>
-            <button class="copy-btn" data-code="${escHtml(l.code)}">
-              <i class="fas fa-copy"></i> Copy Code
-            </button>
+            <div class="weapon-codes-list">
+              ${buildCodesHtml(l)}
+            </div>
           </div>`;
       }).join('');
       favGrid.querySelectorAll('.copy-btn').forEach(btn => btn.addEventListener('click', handleCopy));
@@ -329,15 +385,13 @@ function renderLoadouts(loadouts) {
     return `
       <div class="loadout-card" data-category="${escHtml(l.category || '')}">
         <div class="loadout-card-header">
-          <div class="loadout-icon"><i class="fas fa-crosshairs"></i></div>
-          <div class="loadout-title">${escHtml(l.title)}</div>
+          <div class="loadout-icon"><i class="fas fa-gun"></i></div>
+          <div class="loadout-title">${escHtml(l.weaponName || l.title || 'Weapon')}</div>
           ${catTag}
         </div>
-        <div class="loadout-code-label">Weapon Code</div>
-        <div class="loadout-code">${escHtml(l.code)}</div>
-        <button class="copy-btn" data-code="${escHtml(l.code)}">
-          <i class="fas fa-copy"></i> Copy Code
-        </button>
+        <div class="weapon-codes-list">
+          ${buildCodesHtml(l)}
+        </div>
       </div>`;
   }).join('');
 
@@ -477,25 +531,47 @@ function renderPcSpecs(specs) {
   const card = document.getElementById('specsCard');
   if (!card) return;
 
-  const items = [
-    { icon: 'fas fa-microchip', label: 'CPU',      value: specs.cpu      },
-    { icon: 'fas fa-film',      label: 'GPU',      value: specs.gpu      },
-    { icon: 'fas fa-memory',    label: 'RAM',      value: specs.ram      },
-    { icon: 'fas fa-tv',        label: 'Monitor',  value: specs.monitor  },
-    { icon: 'fas fa-mouse',     label: 'Mouse',    value: specs.mouse    },
-    { icon: 'fas fa-keyboard',  label: 'Keyboard', value: specs.keyboard },
-    { icon: 'fas fa-headphones',label: 'Headset',  value: specs.headset  }
+  /* Helper: render a list of items (multi-value separated by newlines) */
+  function renderSpecItem(icon, label, value) {
+    const lines = (value || '').split('\n').map(v => v.trim()).filter(Boolean);
+    if (lines.length === 0) lines.push('—');
+    const valueHtml = lines.length === 1
+      ? `<div class="spec-value">${escHtml(lines[0])}</div>`
+      : `<ul class="spec-value-list">${lines.map(v => `<li>${escHtml(v)}</li>`).join('')}</ul>`;
+    return `
+      <div class="spec-item">
+        <div class="spec-icon"><i class="${icon}"></i></div>
+        <div class="spec-info">
+          <div class="spec-label">${label}</div>
+          ${valueHtml}
+        </div>
+      </div>`;
+  }
+
+  const pcItems = [
+    { icon: 'fas fa-microchip', label: 'CPU',     value: specs.cpu     },
+    { icon: 'fas fa-film',      label: 'GPU',     value: specs.gpu     },
+    { icon: 'fas fa-memory',    label: 'RAM',     value: specs.ram     },
+    { icon: 'fas fa-tv',        label: 'Monitor', value: specs.monitor }
   ];
 
-  card.innerHTML = items.map(item => `
-    <div class="spec-item">
-      <div class="spec-icon"><i class="${item.icon}"></i></div>
-      <div class="spec-info">
-        <div class="spec-label">${item.label}</div>
-        <div class="spec-value">${escHtml(item.value || '—')}</div>
-      </div>
+  const equipItems = [
+    { icon: 'fas fa-mouse',      label: 'Mouse',     value: specs.mouse    },
+    { icon: 'fas fa-keyboard',   label: 'Keyboard',  value: specs.keyboard },
+    { icon: 'fas fa-headphones', label: 'Headset',   value: specs.headset  },
+    { icon: 'fas fa-expand-alt', label: 'Mousepad',  value: specs.mousepad }
+  ];
+
+  card.innerHTML = `
+    <div class="specs-subsection">
+      <h3 class="specs-subtitle">PC Specs</h3>
+      <div class="specs-grid">${pcItems.map(i => renderSpecItem(i.icon, i.label, i.value)).join('')}</div>
     </div>
-  `).join('');
+    <div class="specs-subsection">
+      <h3 class="specs-subtitle">Equipment</h3>
+      <div class="specs-grid">${equipItems.map(i => renderSpecItem(i.icon, i.label, i.value)).join('')}</div>
+    </div>
+  `;
 }
 
 /* ── RENDER STATS ────────────────────────────────────────── */
@@ -541,19 +617,17 @@ function renderProfile(profile) {
   if (!card) return;
 
   const metaItems = [
-    { icon: 'fas fa-id-badge',    val: profile.playerId  },
-    { icon: 'fas fa-globe-asia',  val: profile.region    },
-    { icon: 'fas fa-running',     val: profile.playstyle }
+    { icon: null, emoji: '🇮🇩', val: profile.region    },
+    { icon: 'fas fa-running',    val: profile.playstyle }
   ].filter(m => m.val);
 
   card.innerHTML = `
     <div class="profile-avatar"><i class="fas fa-user-astronaut"></i></div>
     <div class="profile-nickname">${escHtml(profile.nickname || 'Unknown Player')}</div>
-    ${profile.rank ? `<div class="profile-rank-badge"><i class="fas fa-star"></i> ${escHtml(profile.rank)}</div>` : ''}
     <div class="profile-meta">
       ${metaItems.map(m => `
         <span class="profile-meta-item">
-          <i class="${m.icon}"></i> ${escHtml(m.val)}
+          ${m.emoji ? m.emoji : `<i class="${m.icon}"></i>`} ${escHtml(m.val)}
         </span>
       `).join('')}
     </div>
@@ -608,7 +682,7 @@ function renderTestimonials(testimonials) {
   if (!grid) return;
   const visible = testimonials.filter(t => t.visible);
   if (visible.length === 0) {
-    grid.innerHTML = '<div class="empty-state"><i class="fas fa-comment"></i><p>No testimonials yet.</p></div>';
+    grid.innerHTML = '<div class="empty-state"><i class="fas fa-comment"></i><p>No testimonials yet. Be the first to leave a comment!</p></div>';
     return;
   }
   grid.innerHTML = visible.map(t => {
@@ -622,9 +696,34 @@ function renderTestimonials(testimonials) {
   }).join('');
 }
 
+function initPublicTestimonialForm() {
+  const form = document.getElementById('publicTestimonialForm');
+  if (!form) return;
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const name    = document.getElementById('publicTestimonialName').value.trim();
+    const message = document.getElementById('publicTestimonialMessage').value.trim();
+    if (!name || !message) return;
+    let testimonials = getData('testimonials') || DEFAULT_DATA.testimonials;
+    testimonials.push({
+      id:         Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      senderName: name,
+      message:    message,
+      censored:   false,
+      visible:    true
+    });
+    try {
+      localStorage.setItem('dfloadout_testimonials', JSON.stringify(testimonials));
+    } catch(err) { /* storage full */ }
+    form.reset();
+    renderTestimonials(testimonials);
+    showToast('Your comment has been submitted! Thank you 🙏');
+  });
+}
+
 /* ── RENDER SEASON STATS ─────────────────────────────────── */
 function buildRadarSVG(radar) {
-  const cx = 110, cy = 110, maxR = 80;
+  const cx = 130, cy = 130, maxR = 80;
   const axes = [
     { key: 'shooting',  label: 'Shooting',  angle: 90 },
     { key: 'survival',  label: 'Survival',  angle: 18 },
@@ -658,13 +757,13 @@ function buildRadarSVG(radar) {
   const dataDots = dataPoints.map(p => `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4" fill="#0ff796"/>`).join('');
 
   const labels = axes.map(a => {
-    const labelR = maxR + 22;
+    const labelR = maxR + 32;
     const p = pt(a.angle, labelR);
     const anchor = p.x < cx - 5 ? 'end' : p.x > cx + 5 ? 'start' : 'middle';
-    return `<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" text-anchor="${anchor}" dominant-baseline="middle" fill="rgba(255,255,255,0.8)" font-size="10" font-family="Rajdhani,sans-serif">${a.label}</text>`;
+    return `<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" text-anchor="${anchor}" dominant-baseline="middle" fill="rgba(255,255,255,0.95)" font-size="12" font-weight="700" font-family="Rajdhani,sans-serif">${a.label}</text>`;
   }).join('');
 
-  return `<svg class="radar-chart" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+  return `<svg class="radar-chart" viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
     ${gridLines}${axisLines}${dataPolygon}${dataDots}${labels}
   </svg>`;
 }
@@ -722,7 +821,7 @@ function initScrollAnimations() {
   }, { threshold: 0.1 });
 
   targets.forEach((el, i) => {
-    el.style.animationDelay = (i % 8) * 0.07 + 's';
+    el.style.transitionDelay = (i % 8) * 0.07 + 's';
     observer.observe(el);
   });
 }
@@ -754,6 +853,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!document.getElementById('loginOverlay')) {
     const data = getAllData();
     renderHeroStats(data);
+    renderHeroTagline(data.loadouts);
     initVisitorCounter();
     renderSocialLinks(data.socialLinks);
     renderLoadouts(data.loadouts);
@@ -764,6 +864,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderProfile(data.profile);
     renderClips(data.clips);
     renderTestimonials(data.testimonials);
+    initPublicTestimonialForm();
     renderSeasonStats(data.seasonStats);
     initLightbox();
     initNavScroll();

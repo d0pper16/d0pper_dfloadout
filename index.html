@@ -41,19 +41,21 @@
     </div>
   </nav>
 
+  <!-- VISITOR COUNTER (top-right fixed) -->
+  <div class="visitor-counter-fixed" id="visitorCounterFixed">
+    <i class="fas fa-eye"></i> <span id="viewCount">0</span>
+  </div>
+
   <!-- HERO SECTION -->
   <section class="hero" id="home">
     <div class="hero-grid"></div>
     <div class="hero-content">
       <div class="hero-badge">DELTA FORCE</div>
       <h1 class="hero-title">D0PPER.</h1>
-      <p class="hero-sub">player profile, loadout codes, ingame setting, social media, ...</p>
+      <p class="hero-sub" id="heroSub">loadout codes, settings, achievements, ...</p>
       <div class="hero-actions">
         <a href="#loadouts" class="btn btn-primary"><i class="fas fa-crosshairs"></i> View Loadouts</a>
         <a href="#settings" class="btn btn-outline"><i class="fas fa-sliders-h"></i> Settings</a>
-      </div>
-      <div class="visitor-counter" id="visitorCounter">
-        <i class="fas fa-eye"></i> <span id="viewCount">0</span> views
       </div>
       <div class="social-links" id="socialLinks">
         <!-- Filled by JS -->
@@ -104,8 +106,8 @@
     <div class="container">
       <div class="section-header">
         <div class="section-tag">HONOR</div>
-        <h2 class="section-title">Achievements</h2>
-        <p class="section-desc">Notable milestones and accomplishments on the battlefield.</p>
+        <h2 class="section-title">🏆 Achievements</h2>
+        <p class="section-desc">the results obtained</p>
       </div>
       <div class="achievements-grid" id="achievementsGrid">
         <!-- Filled by JS -->
@@ -118,8 +120,8 @@
     <div class="container">
       <div class="section-header">
         <div class="section-tag">HARDWARE</div>
-        <h2 class="section-title">PC Specs &amp; Setup</h2>
-        <p class="section-desc">The battle station powering the loadouts.</p>
+        <h2 class="section-title">Spec &amp; Equipment</h2>
+        <p class="section-desc">PC specs and supporting equipment</p>
       </div>
       <div class="specs-card" id="specsCard">
         <!-- Filled by JS -->
@@ -169,20 +171,6 @@
     </div>
   </section>
 
-  <!-- TESTIMONIALS SECTION -->
-  <section class="section" id="testimonials">
-    <div class="container">
-      <div class="section-header">
-        <div class="section-tag">SHOUTOUTS</div>
-        <h2 class="section-title">💬 Testimonials</h2>
-        <p class="section-desc">Words from teammates and the community.</p>
-      </div>
-      <div class="testimonials-grid" id="testimonialsGrid">
-        <!-- Filled by JS -->
-      </div>
-    </div>
-  </section>
-
   <!-- SEASON STATS SECTION -->
   <section class="section section-alt" id="season-stats">
     <div class="container">
@@ -197,14 +185,41 @@
     </div>
   </section>
 
+  <!-- TESTIMONIALS SECTION (bottom, before footer) -->
+  <section class="section" id="testimonials">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">SHOUTOUTS</div>
+        <h2 class="section-title">💬 Testimonials</h2>
+        <p class="section-desc">Words from teammates and the community.</p>
+      </div>
+      <!-- Public Submit Form -->
+      <div class="testimonial-form-public">
+        <h3 class="testimonial-form-title">Leave a Comment</h3>
+        <form id="publicTestimonialForm">
+          <div class="form-group">
+            <label for="publicTestimonialName">Your Name</label>
+            <input type="text" id="publicTestimonialName" placeholder="Enter your name..." maxlength="60" required />
+          </div>
+          <div class="form-group">
+            <label for="publicTestimonialMessage">Message</label>
+            <textarea id="publicTestimonialMessage" rows="3" placeholder="Write your message..." maxlength="500" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-paper-plane"></i> Submit
+          </button>
+        </form>
+      </div>
+      <div class="testimonials-grid" id="testimonialsGrid">
+        <!-- Filled by JS -->
+      </div>
+    </div>
+  </section>
+
   <!-- FOOTER -->
   <footer class="footer">
     <div class="container">
-      <div class="footer-brand">
-        <span class="brand-icon">⬡</span>
-        <span>D0PPER.</span>
-      </div>
-      <p class="footer-text">Powered by D0PPER. &mdash; Delta Force Loadout Hub</p>
+      <p class="footer-text">Powered by D0PPER.</p>
       <p class="footer-copy">&copy; <span id="footerYear"></span> D0PPER. All rights reserved.</p>
     </div>
   </footer>

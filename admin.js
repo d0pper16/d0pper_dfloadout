@@ -108,6 +108,50 @@ function initLoadoutManager() {
   const form      = document.getElementById('loadoutForm');
   const cancelBtn = document.getElementById('loadoutCancelBtn');
   const idField   = document.getElementById('loadoutId');
+  const addCodeBtn = document.getElementById('addCodeEntryBtn');
+  const codesList  = document.getElementById('codeEntriesList');
+  if (!form) return;
+
+  /* ── Code entries builder ── */
+  function addCodeEntry(name = '', code = '') {
+    const idx = codesList.children.length;
+    const row = document.createElement('div');
+    row.className = 'code-entry-row';
+    row.innerHTML = `
+      <div class="form-row" style="align-items:flex-start;gap:.75rem">
+        <div class="form-group" style="flex:1">
+          <label class="label-sm">Code Name</label>
+          <input type="text" class="code-entry-name" placeholder="e.g. CQB Build" value="${window.dfApp.escHtml(name)}" required />
+        </div>
+        <div class="form-group" style="flex:2">
+          <label class="label-sm">Loadout Code</label>
+          <input type="text" class="code-entry-code" placeholder="e.g. DF-M4A1-CQB-..." value="${window.dfApp.escHtml(code)}" required />
+        </div>
+        <div class="form-group" style="flex:0;padding-top:1.7rem">
+          <button type="button" class="btn btn-danger btn-sm remove-code-btn" title="Remove this code">
+            <i class="fas fa-minus"></i>
+          </button>
+        </div>
+      </div>`;
+    row.querySelector('.remove-code-btn').addEventListener('click', () => {
+      if (codesList.children.length > 1) {
+        row.remove();
+      } else {
+        showAdminToast('At least one code is required.', 'error');
+      }
+    });
+    codesList.appendChild(row);
+  }
+
+  function getCodeEntries() {
+    const rows = codesList.querySelectorAll('.code-entry-row');
+    return Array.from(rows).map(row => ({
+      name: row.querySelector('.code-entry-name').value.trim(),
+      code: row.querySelector('.code-entry-code').value.trim()
+    })).filter(e => e.name && e.code);
+  }
+
+  if (addCodeBtn) addCodeBtn.addEventListener('click', () => addCodeEntry());
 
   function renderList() {
     const loadouts = window.dfApp.getData('loadouts') || window.dfApp.DEFAULT_DATA.loadouts;
@@ -122,11 +166,12 @@ function initLoadoutManager() {
     list.innerHTML = loadouts.map(l => {
       const catTag  = l.category ? `<span class="admin-tag">${window.dfApp.escHtml(l.category)}</span>` : '';
       const featTag = l.featured  ? `<span class="admin-tag featured-tag">⭐ Favorite</span>` : '';
+      const codeCount = Array.isArray(l.codes) ? l.codes.length : 1;
       return `
         <div class="admin-list-item" data-id="${l.id}">
           <div class="admin-list-item-info">
-            <div class="admin-list-item-title">${window.dfApp.escHtml(l.title)} ${catTag} ${featTag}</div>
-            <div class="admin-list-item-sub">${window.dfApp.escHtml(l.code)}</div>
+            <div class="admin-list-item-title"><i class="fas fa-gun"></i> ${window.dfApp.escHtml(l.weaponName || l.title || 'Weapon')} ${catTag} ${featTag}</div>
+            <div class="admin-list-item-sub">${codeCount} code${codeCount !== 1 ? 's' : ''}</div>
           </div>
           <div class="admin-list-item-actions">
             <button class="btn btn-outline btn-sm edit-loadout-btn" data-id="${l.id}">
@@ -150,7 +195,9 @@ function initLoadoutManager() {
   function resetForm() {
     form.reset();
     idField.value = '';
-    document.getElementById('loadoutFormTitle').textContent = 'Add New Loadout';
+    codesList.innerHTML = '';
+    addCodeEntry(); /* start with one empty entry */
+    document.getElementById('loadoutFormTitle').textContent = 'Add New Weapon Loadout';
     document.getElementById('loadoutSubmitText').textContent = 'Add Loadout';
     cancelBtn.style.display = 'none';
   }
@@ -161,11 +208,17 @@ function initLoadoutManager() {
     if (!item) return;
 
     idField.value = id;
-    document.getElementById('loadoutTitle').value    = item.title    || '';
-    document.getElementById('loadoutCode').value     = item.code     || '';
-    document.getElementById('loadoutCategory').value = item.category || '';
+    document.getElementById('loadoutWeaponName').value = item.weaponName || item.title || '';
+    document.getElementById('loadoutCategory').value   = item.category || '';
     document.getElementById('loadoutFeatured').checked = !!item.featured;
-    document.getElementById('loadoutFormTitle').textContent  = 'Edit Loadout';
+
+    codesList.innerHTML = '';
+    const codes = Array.isArray(item.codes) && item.codes.length
+      ? item.codes
+      : [{ name: item.title || '', code: item.code || '' }];
+    codes.forEach(c => addCodeEntry(c.name, c.code));
+
+    document.getElementById('loadoutFormTitle').textContent  = 'Edit Weapon Loadout';
     document.getElementById('loadoutSubmitText').textContent = 'Update Loadout';
     cancelBtn.style.display = 'inline-flex';
     document.getElementById('section-loadouts').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -182,20 +235,23 @@ function initLoadoutManager() {
 
   form.addEventListener('submit', e => {
     e.preventDefault();
-    const title    = document.getElementById('loadoutTitle').value.trim();
-    const code     = document.getElementById('loadoutCode').value.trim();
-    const category = document.getElementById('loadoutCategory').value.trim();
-    const featured = document.getElementById('loadoutFeatured').checked;
-    if (!title || !code) return;
+    const weaponName = document.getElementById('loadoutWeaponName').value.trim();
+    const category   = document.getElementById('loadoutCategory').value.trim();
+    const featured   = document.getElementById('loadoutFeatured').checked;
+    const codes      = getCodeEntries();
+    if (!weaponName || codes.length === 0) {
+      showAdminToast('Weapon name and at least one code are required.', 'error');
+      return;
+    }
 
     let loadouts = window.dfApp.getData('loadouts') || window.dfApp.DEFAULT_DATA.loadouts;
     const existingId = idField.value;
 
     if (existingId) {
-      loadouts = loadouts.map(l => l.id === existingId ? { ...l, title, code, category, featured } : l);
+      loadouts = loadouts.map(l => l.id === existingId ? { ...l, weaponName, category, featured, codes } : l);
       showAdminToast('Loadout updated successfully!');
     } else {
-      loadouts.push({ id: generateId(), title, code, category, featured });
+      loadouts.push({ id: generateId(), weaponName, category, featured, codes });
       showAdminToast('Loadout added successfully!');
     }
 
@@ -205,6 +261,7 @@ function initLoadoutManager() {
   });
 
   cancelBtn.addEventListener('click', resetForm);
+  resetForm(); /* initialize with one code entry */
   renderList();
 }
 
@@ -446,6 +503,7 @@ function initPcSpecsManager() {
     document.getElementById('specMouse').value    = s.mouse    || '';
     document.getElementById('specKeyboard').value = s.keyboard || '';
     document.getElementById('specHeadset').value  = s.headset  || '';
+    document.getElementById('specMousepad').value = s.mousepad || '';
   }
 
   form.addEventListener('submit', e => {
@@ -457,10 +515,11 @@ function initPcSpecsManager() {
       monitor:  document.getElementById('specMonitor').value.trim(),
       mouse:    document.getElementById('specMouse').value.trim(),
       keyboard: document.getElementById('specKeyboard').value.trim(),
-      headset:  document.getElementById('specHeadset').value.trim()
+      headset:  document.getElementById('specHeadset').value.trim(),
+      mousepad: document.getElementById('specMousepad').value.trim()
     };
     saveData('pcSpecs', pcSpecs);
-    showAdminToast('PC Specs saved successfully!');
+    showAdminToast('Spec & Equipment saved successfully!');
   });
 
   loadSpecs();
@@ -474,8 +533,6 @@ function initProfileManager() {
   function loadProfile() {
     const p = window.dfApp.getData('profile') || window.dfApp.DEFAULT_DATA.profile;
     document.getElementById('profileNickname').value  = p.nickname   || '';
-    document.getElementById('profilePlayerId').value  = p.playerId   || '';
-    document.getElementById('profileRank').value      = p.rank       || '';
     document.getElementById('profileRegion').value    = p.region     || '';
     document.getElementById('profilePlaystyle').value = p.playstyle  || '';
     document.getElementById('profileBio').value       = p.bio        || '';
@@ -485,8 +542,6 @@ function initProfileManager() {
     e.preventDefault();
     const profile = {
       nickname:  document.getElementById('profileNickname').value.trim(),
-      playerId:  document.getElementById('profilePlayerId').value.trim(),
-      rank:      document.getElementById('profileRank').value.trim(),
       region:    document.getElementById('profileRegion').value.trim(),
       playstyle: document.getElementById('profilePlaystyle').value.trim(),
       bio:       document.getElementById('profileBio').value.trim()
@@ -704,17 +759,12 @@ function initClipManager() {
 
 /* ── TESTIMONIAL MANAGEMENT ──────────────────────────────── */
 function initTestimonialManager() {
-  const form = document.getElementById('testimonialForm');
-  const cancelBtn = document.getElementById('testimonialCancelBtn');
-  const idField = document.getElementById('testimonialId');
-  if (!form) return;
-
   function renderList() {
     const testimonials = window.dfApp.getData('testimonials') || [];
     const list = document.getElementById('testimonialList');
     if (!list) return;
     if (testimonials.length === 0) {
-      list.innerHTML = '<p style="color:var(--text-muted);font-size:.9rem;text-align:center;padding:1rem;">No testimonials yet.</p>';
+      list.innerHTML = '<p style="color:var(--text-muted);font-size:.9rem;text-align:center;padding:1rem;">No testimonials yet. Visitors can submit from the public site.</p>';
       return;
     }
     list.innerHTML = testimonials.map(t => {
@@ -731,38 +781,37 @@ function initTestimonialManager() {
             <div class="admin-list-item-sub">${window.dfApp.escHtml(t.message)}</div>
           </div>
           <div class="admin-list-item-actions">
-            <button class="btn btn-outline btn-sm edit-testimonial-btn" data-id="${t.id}"><i class="fas fa-edit"></i> Edit</button>
+            <button class="btn btn-outline btn-sm toggle-vis-btn" data-id="${t.id}" title="${t.visible ? 'Hide' : 'Show'}">
+              <i class="fas fa-${t.visible ? 'eye-slash' : 'eye'}"></i>
+            </button>
+            <button class="btn btn-outline btn-sm toggle-censor-btn" data-id="${t.id}" title="${t.censored ? 'Uncensor' : 'Censor'} name">
+              <i class="fas fa-${t.censored ? 'unlock' : 'lock'}"></i>
+            </button>
             <button class="btn btn-danger btn-sm delete-testimonial-btn" data-id="${t.id}"><i class="fas fa-trash"></i></button>
           </div>
         </div>`;
     }).join('');
-    list.querySelectorAll('.edit-testimonial-btn').forEach(btn => btn.addEventListener('click', () => editTestimonial(btn.dataset.id)));
+    list.querySelectorAll('.toggle-vis-btn').forEach(btn => btn.addEventListener('click', () => toggleTestimonialVisibility(btn.dataset.id)));
+    list.querySelectorAll('.toggle-censor-btn').forEach(btn => btn.addEventListener('click', () => toggleTestimonialCensor(btn.dataset.id)));
     list.querySelectorAll('.delete-testimonial-btn').forEach(btn => btn.addEventListener('click', () => deleteTestimonial(btn.dataset.id)));
   }
 
-  function resetForm() {
-    form.reset();
-    idField.value = '';
-    document.getElementById('testimonialFormTitle').textContent = 'Add New Testimonial';
-    document.getElementById('testimonialSubmitText').textContent = 'Add Testimonial';
-    cancelBtn.style.display = 'none';
-    document.getElementById('testimonialVisible').checked = true;
-    document.getElementById('testimonialCensored').checked = false;
+  function toggleTestimonialVisibility(id) {
+    let testimonials = window.dfApp.getData('testimonials') || [];
+    testimonials = testimonials.map(t => t.id === id ? { ...t, visible: !t.visible } : t);
+    saveData('testimonials', testimonials);
+    renderList();
+    const updated = testimonials.find(t => t.id === id);
+    showAdminToast(`Testimonial ${updated.visible ? 'shown' : 'hidden'} on public site.`);
   }
 
-  function editTestimonial(id) {
-    const testimonials = window.dfApp.getData('testimonials') || [];
-    const item = testimonials.find(t => t.id === id);
-    if (!item) return;
-    idField.value = id;
-    document.getElementById('testimonialName').value = item.senderName || '';
-    document.getElementById('testimonialMessage').value = item.message || '';
-    document.getElementById('testimonialCensored').checked = !!item.censored;
-    document.getElementById('testimonialVisible').checked = !!item.visible;
-    document.getElementById('testimonialFormTitle').textContent = 'Edit Testimonial';
-    document.getElementById('testimonialSubmitText').textContent = 'Update Testimonial';
-    cancelBtn.style.display = 'inline-flex';
-    document.getElementById('section-testimonials').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  function toggleTestimonialCensor(id) {
+    let testimonials = window.dfApp.getData('testimonials') || [];
+    testimonials = testimonials.map(t => t.id === id ? { ...t, censored: !t.censored } : t);
+    saveData('testimonials', testimonials);
+    renderList();
+    const updated = testimonials.find(t => t.id === id);
+    showAdminToast(`Name ${updated.censored ? 'censored' : 'uncensored'}.`);
   }
 
   function deleteTestimonial(id) {
@@ -774,28 +823,6 @@ function initTestimonialManager() {
     showAdminToast('Testimonial deleted.');
   }
 
-  form.addEventListener('submit', e => {
-    e.preventDefault();
-    const senderName = document.getElementById('testimonialName').value.trim();
-    const message = document.getElementById('testimonialMessage').value.trim();
-    const censored = document.getElementById('testimonialCensored').checked;
-    const visible = document.getElementById('testimonialVisible').checked;
-    if (!senderName || !message) return;
-    let testimonials = window.dfApp.getData('testimonials') || [];
-    const existingId = idField.value;
-    if (existingId) {
-      testimonials = testimonials.map(t => t.id === existingId ? { ...t, senderName, message, censored, visible } : t);
-      showAdminToast('Testimonial updated!');
-    } else {
-      testimonials.push({ id: generateId(), senderName, message, censored, visible });
-      showAdminToast('Testimonial added!');
-    }
-    saveData('testimonials', testimonials);
-    renderList();
-    resetForm();
-  });
-
-  cancelBtn.addEventListener('click', resetForm);
   renderList();
 }
 

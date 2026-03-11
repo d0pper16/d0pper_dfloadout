@@ -559,3 +559,16 @@
     justify-content: flex-end;
   }
 }
+
+/* ── CODE ENTRY ROW ──────────────────────────────────────── */
+.code-entry-row {
+  background: var(--admin-bg-secondary, rgba(0,0,0,0.15));
+  border: 1px solid var(--admin-border, rgba(255,255,255,0.08));
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.code-entry-row .form-row {
+  margin-bottom: 0;
+}
