@@ -33,7 +33,7 @@ const DEFAULT_DATA = {
     {
       id: 'ach-002',
       placement: 'Top 4',
-      tournament: 'SEA Regional Championship',
+      tournament: 'SEA al Championship',
       monthYear: 'Februari 2025',
       team: 'Team Alpha',
       description: 'Top 4 finish in a 32-team bracket.',
@@ -55,7 +55,7 @@ const DEFAULT_DATA = {
     nickname:     'd0pper',
     playerId:     'DF-882741',
     rank:         'Elite IV',
-    region:       'SEA',
+    :       'SEA',
     playstyle:    'Aggressive Assault',
     bio:          'Delta Force veteran focused on aggressive entry tactics and tight-quarters combat. Specializing in CQB loadouts and high-pressure engagements. Always pushing.',
     team:         'Team Alpha',
@@ -602,9 +602,9 @@ function renderProfile(profile) {
 
   const fields = [
     profile.region    && { icon: 'fas fa-globe-asia',      val: regionDisplay },
-    profile.playstyle && { icon: 'fas fa-running',          val: escHtml(profile.playstyle) },
+    profile.playstyle && { icon: 'fa-solid fa-gun',          val: escHtml(profile.playstyle) },
     profile.birthplace && { icon: 'fas fa-map-marker-alt', val: escHtml(profile.birthplace) },
-    profile.birthday  && { icon: 'fas fa-birthday-cake',   val: escHtml(profile.birthday) }
+    profile.birthday  && { icon: 'fa-solid fa-calendar',   val: escHtml(profile.birthday) }
   ].filter(Boolean);
 
   card.innerHTML = `
