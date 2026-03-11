@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Player Profile | D0PPER.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="loadout.html" class="nav-link">Loadout</a></li>
+        <li><a href="profile.html" class="nav-link active">Player Profile</a></li>
+        <li><a href="season-stats.html" class="nav-link">Season Stats</a></li>
+        <li><a href="team-history.html" class="nav-link">Team History</a></li>
+        <li><a href="admin.html" class="nav-link nav-admin"><i class="fas fa-lock"></i> Admin</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- VISITOR COUNTER -->
+  <div class="visitor-counter" id="visitorCounter">
+    <i class="fas fa-eye"></i> <span id="viewCount">0</span> views
+  </div>
+
+  <!-- PAGE HERO -->
+  <section class="page-hero">
+    <div class="container">
+      <div class="page-hero-badge">OPERATOR</div>
+      <h1 class="page-hero-title">Player Profile</h1>
+      <p class="page-hero-desc">Operator intel and mission background.</p>
+    </div>
+  </section>
+
+  <!-- PROFILE SECTION -->
+  <section class="section" id="about">
+    <div class="container">
+      <div class="profile-card" id="profileCard">
+        <!-- Filled by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <p class="footer-text">Powered by D0PPER.</p>
+      <p class="footer-copy">&copy; <span id="footerYear"></span> D0PPER. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- COPY TOAST -->
+  <div class="toast" id="copyToast"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
