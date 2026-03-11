@@ -706,7 +706,7 @@ function initPublicTestimonialForm() {
     if (!name || !message) return;
     let testimonials = getData('testimonials') || DEFAULT_DATA.testimonials;
     testimonials.push({
-      id:         Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      id:         generateId(),
       senderName: name,
       message:    message,
       censored:   false,
@@ -826,6 +826,11 @@ function initScrollAnimations() {
   });
 }
 
+/* ── ID GENERATOR (shared) ───────────────────────────────── */
+function generateId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+
 /* ── HTML ESCAPE ─────────────────────────────────────────── */
 function escHtml(str) {
   if (str == null) return '';
@@ -879,5 +884,6 @@ window.dfApp = {
   getData,
   getAllData,
   escHtml,
+  generateId,
   DEFAULT_DATA
 };
