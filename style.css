@@ -1290,3 +1290,259 @@ ul { list-style: none; }
   .toast { left: 1rem; right: 1rem; text-align: center; justify-content: center; }
   .hero-title { font-size: 1.6rem; }
 }
+
+/* ── GAMEPLAY CLIPS ──────────────────────────────────────── */
+.clips-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.clip-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.clip-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(15,247,150,0.1);
+  border-color: var(--accent2);
+}
+
+.clip-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1rem;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.clip-header i {
+  font-size: 1.1rem;
+  color: var(--accent2);
+  flex-shrink: 0;
+}
+
+.clip-platform-label {
+  font-size: 0.7rem;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--accent2);
+  background: rgba(15,247,150,0.1);
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.clip-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.clip-embed-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 */
+}
+
+.clip-embed-wrapper iframe {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  border: none;
+}
+
+/* ── TESTIMONIALS ────────────────────────────────────────── */
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.testimonial-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  position: relative;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.testimonial-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(15,247,150,0.08);
+  border-color: rgba(15,247,150,0.3);
+}
+
+.testimonial-quote-icon {
+  font-size: 1.8rem;
+  color: var(--accent2);
+  opacity: 0.35;
+  margin-bottom: 0.75rem;
+  line-height: 1;
+}
+
+.testimonial-message {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  font-style: italic;
+  margin-bottom: 1.25rem;
+}
+
+.testimonial-sender {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--accent2);
+  letter-spacing: 0.04em;
+}
+
+.testimonial-sender i {
+  font-size: 1.1rem;
+  opacity: 0.8;
+}
+
+/* ── SEASON STATS ────────────────────────────────────────── */
+.season-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.season-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.season-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(15,247,150,0.1);
+  border-color: rgba(15,247,150,0.3);
+}
+
+.season-card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1.25rem;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: 0.06em;
+  color: var(--accent2);
+}
+
+.season-card-title i { font-size: 1rem; }
+
+.season-card-body { padding: 1.25rem; }
+
+.season-stats-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.season-stats-col {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.75rem;
+}
+
+.season-stat-group-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent2);
+  margin-bottom: 0.4rem;
+}
+
+.season-stat-line {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  padding: 0.15rem 0;
+}
+
+.season-stat-line span:last-child {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.season-radar-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0.75rem 0;
+}
+
+.radar-canvas {
+  max-width: 260px;
+  max-height: 260px;
+  width: 100%;
+  height: auto;
+}
+
+.season-radar-legend {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.3rem 1rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.radar-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.radar-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent2);
+  flex-shrink: 0;
+}
+
+.radar-legend-val {
+  margin-left: auto;
+  font-weight: 600;
+  color: var(--accent2);
+}
+
+/* ── RESPONSIVE: CLIPS, TESTIMONIALS, SEASON STATS ────────── */
+@media (max-width: 768px) {
+  .clips-grid {
+    grid-template-columns: 1fr;
+  }
+  .season-stats-grid {
+    grid-template-columns: 1fr;
+  }
+  .testimonials-grid {
+    grid-template-columns: 1fr;
+  }
+}

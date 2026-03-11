@@ -559,3 +559,38 @@
     justify-content: flex-end;
   }
 }
+
+/* ── ADMIN RADAR PREVIEW ─────────────────────────────────── */
+.radar-preview-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+  padding: 1rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+}
+
+#adminRadarPreview {
+  max-width: 220px;
+  max-height: 220px;
+}
+
+/* clip platform select */
+#clipPlatform {
+  appearance: none;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-primary);
+  padding: 0.6rem 0.75rem;
+  font-size: 0.9rem;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  width: 100%;
+}
+
+#clipPlatform:focus {
+  outline: none;
+  border-color: var(--accent2);
+}
