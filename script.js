@@ -345,7 +345,7 @@ function renderLoadouts(loadouts) {
           <div class="favorite-loadout-card" data-category="${escHtml(l.category || '')}">
             <div class="favorite-badge">⭐ FAVORITE</div>
             <div class="loadout-card-header">
-              <div class="loadout-icon"><i class="fas fa-crosshairs"></i></div>
+              <div class="loadout-icon"><i class="fa-solid fa-gun"></i></div>
               <div class="loadout-title">${escHtml(l.title)}</div>
               ${catTag}
             </div>
@@ -367,7 +367,7 @@ function renderLoadouts(loadouts) {
     return `
       <div class="loadout-card" data-category="${escHtml(l.category || '')}">
         <div class="loadout-card-header">
-          <div class="loadout-icon"><i class="fas fa-crosshairs"></i></div>
+          <div class="loadout-icon"><i class="fa-solid fa-gun"></i></div>
           <div class="loadout-title">${escHtml(l.title)}</div>
           ${catTag}
         </div>
@@ -597,7 +597,7 @@ function renderProfile(profile) {
     : '';
 
   const regionDisplay = profile.region
-    ? `🇮🇩 ${escHtml(profile.region)}`
+    ? `${escHtml(profile.region)}`
     : '—';
 
   const fields = [
