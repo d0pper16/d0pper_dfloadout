@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>d0pper_dfloadout | Delta Force Loadout Hub</title>
+  <title>GUNSMITH DELTAFORCE by D0PPER. | Delta Force Loadout Hub</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -17,13 +17,14 @@
     <div class="nav-container">
       <a href="#home" class="nav-brand">
         <span class="brand-icon">⬡</span>
-        <span class="brand-text">d0pper_dfloadout</span>
+        <span class="brand-text">GUNSMITH DELTAFORCE by D0PPER.</span>
       </a>
       <ul class="nav-links" id="navLinks">
         <li><a href="#home" class="nav-link active">Home</a></li>
         <li><a href="#loadouts" class="nav-link">Loadouts</a></li>
         <li><a href="#settings" class="nav-link">Settings</a></li>
         <li><a href="#achievements" class="nav-link">Achievements</a></li>
+        <li><a href="#stats" class="nav-link">Stats</a></li>
         <li><a href="#about" class="nav-link">About</a></li>
         <li><a href="admin.html" class="nav-link nav-admin"><i class="fas fa-lock"></i> Admin</a></li>
       </ul>
@@ -43,12 +44,17 @@
     <div class="hero-grid"></div>
     <div class="hero-content">
       <div class="hero-badge">DELTA FORCE</div>
-      <h1 class="hero-title">d0pper_dfloadout</h1>
-      <p class="hero-tagline">Weapon Loadout Arsenal | Delta Force</p>
+      <h1 class="hero-title">GUNSMITH DELTAFORCE by D0PPER.</h1>
       <p class="hero-sub">Tactical loadout codes, in-game settings, and player profile — all in one hub.</p>
       <div class="hero-actions">
         <a href="#loadouts" class="btn btn-primary"><i class="fas fa-crosshairs"></i> View Loadouts</a>
         <a href="#settings" class="btn btn-outline"><i class="fas fa-sliders-h"></i> Settings</a>
+      </div>
+      <div class="visitor-counter" id="visitorCounter">
+        <i class="fas fa-eye"></i> <span id="viewCount">0</span> views
+      </div>
+      <div class="social-links" id="socialLinks">
+        <!-- Filled by JS -->
       </div>
     </div>
     <div class="hero-stats" id="heroStats">
@@ -63,6 +69,9 @@
         <div class="section-tag">ARSENAL</div>
         <h2 class="section-title">Loadout Library</h2>
         <p class="section-desc">Battle-tested weapon configurations for every situation.</p>
+      </div>
+      <div class="loadout-filter" id="loadoutFilter">
+        <!-- Filled by JS -->
       </div>
       <div class="loadout-grid" id="loadoutGrid">
         <!-- Filled by JS -->
@@ -103,7 +112,7 @@
     <div class="container">
       <div class="section-header">
         <div class="section-tag">HARDWARE</div>
-        <h2 class="section-title">PC Specs & Setup</h2>
+        <h2 class="section-title">PC Specs &amp; Setup</h2>
         <p class="section-desc">The battle station powering the loadouts.</p>
       </div>
       <div class="specs-card" id="specsCard">
@@ -112,8 +121,22 @@
     </div>
   </section>
 
+  <!-- STATS SECTION -->
+  <section class="section" id="stats">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">SKILLS</div>
+        <h2 class="section-title">Player Stats</h2>
+        <p class="section-desc">Performance metrics and skill breakdown.</p>
+      </div>
+      <div class="stats-bars" id="statsBars">
+        <!-- Filled by JS -->
+      </div>
+    </div>
+  </section>
+
   <!-- ABOUT SECTION -->
-  <section class="section" id="about">
+  <section class="section section-alt" id="about">
     <div class="container">
       <div class="section-header">
         <div class="section-tag">PROFILE</div>
@@ -131,16 +154,25 @@
     <div class="container">
       <div class="footer-brand">
         <span class="brand-icon">⬡</span>
-        <span>d0pper_dfloadout</span>
+        <span>GUNSMITH DELTAFORCE by D0PPER.</span>
       </div>
-      <p class="footer-text">Powered by d0pper_dfloadout &mdash; Delta Force Loadout Hub</p>
-      <p class="footer-copy">&copy; <span id="footerYear"></span> d0pper_dfloadout. All rights reserved.</p>
+      <p class="footer-text">Powered by GUNSMITH DELTAFORCE by D0PPER. &mdash; Delta Force Loadout Hub</p>
+      <p class="footer-copy">&copy; <span id="footerYear"></span> GUNSMITH DELTAFORCE by D0PPER. All rights reserved.</p>
     </div>
   </footer>
 
   <!-- COPY TOAST -->
   <div class="toast" id="copyToast">
     <i class="fas fa-check-circle"></i> Code copied to clipboard!
+  </div>
+
+  <!-- LIGHTBOX -->
+  <div class="lightbox" id="lightbox">
+    <div class="lightbox-overlay" id="lightboxOverlay"></div>
+    <div class="lightbox-content">
+      <button class="lightbox-close" id="lightboxClose"><i class="fas fa-times"></i></button>
+      <img class="lightbox-img" id="lightboxImg" src="" alt="Achievement Photo" />
+    </div>
   </div>
 
   <script src="script.js"></script>

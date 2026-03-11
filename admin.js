@@ -1,5 +1,5 @@
 /* ============================================================
-   admin.js — d0pper_dfloadout Admin Panel Logic
+   admin.js — GUNSMITH DELTAFORCE by D0PPER. Admin Panel Logic
    ============================================================ */
 
 'use strict';
@@ -44,15 +44,14 @@ function checkSession() {
 }
 
 function initAuth() {
-  const overlay  = document.getElementById('loginOverlay');
-  const wrapper  = document.getElementById('adminWrapper');
-  const form     = document.getElementById('loginForm');
-  const errEl    = document.getElementById('loginError');
+  const overlay   = document.getElementById('loginOverlay');
+  const wrapper   = document.getElementById('adminWrapper');
+  const form      = document.getElementById('loginForm');
+  const errEl     = document.getElementById('loginError');
   const logoutBtn = document.getElementById('logoutBtn');
 
   if (!overlay || !wrapper) return;
 
-  // Check existing session
   if (checkSession()) {
     overlay.style.display = 'none';
     wrapper.style.display = 'block';
@@ -60,7 +59,6 @@ function initAuth() {
     return;
   }
 
-  // Login form submit
   form.addEventListener('submit', e => {
     e.preventDefault();
     const pw = document.getElementById('adminPassword').value;
@@ -77,7 +75,6 @@ function initAuth() {
     }
   });
 
-  // Logout
   if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
       sessionStorage.removeItem(SESSION_KEY);
@@ -108,9 +105,9 @@ function initSidebarNav() {
 
 /* ── LOADOUT MANAGEMENT ──────────────────────────────────── */
 function initLoadoutManager() {
-  const form       = document.getElementById('loadoutForm');
-  const cancelBtn  = document.getElementById('loadoutCancelBtn');
-  const idField    = document.getElementById('loadoutId');
+  const form      = document.getElementById('loadoutForm');
+  const cancelBtn = document.getElementById('loadoutCancelBtn');
+  const idField   = document.getElementById('loadoutId');
 
   function renderList() {
     const loadouts = window.dfApp.getData('loadouts') || window.dfApp.DEFAULT_DATA.loadouts;
@@ -122,29 +119,29 @@ function initLoadoutManager() {
       return;
     }
 
-    list.innerHTML = loadouts.map(l => `
-      <div class="admin-list-item" data-id="${l.id}">
-        <div class="admin-list-item-info">
-          <div class="admin-list-item-title">${window.dfApp.escHtml(l.title)}</div>
-          <div class="admin-list-item-sub">${window.dfApp.escHtml(l.code)}</div>
-        </div>
-        <div class="admin-list-item-actions">
-          <button class="btn btn-outline btn-sm edit-loadout-btn" data-id="${l.id}">
-            <i class="fas fa-edit"></i> Edit
-          </button>
-          <button class="btn btn-danger btn-sm delete-loadout-btn" data-id="${l.id}">
-            <i class="fas fa-trash"></i>
-          </button>
-        </div>
-      </div>
-    `).join('');
+    list.innerHTML = loadouts.map(l => {
+      const catTag  = l.category ? `<span class="admin-tag">${window.dfApp.escHtml(l.category)}</span>` : '';
+      const featTag = l.featured  ? `<span class="admin-tag featured-tag">⭐ Featured</span>` : '';
+      return `
+        <div class="admin-list-item" data-id="${l.id}">
+          <div class="admin-list-item-info">
+            <div class="admin-list-item-title">${window.dfApp.escHtml(l.title)} ${catTag} ${featTag}</div>
+            <div class="admin-list-item-sub">${window.dfApp.escHtml(l.code)}</div>
+          </div>
+          <div class="admin-list-item-actions">
+            <button class="btn btn-outline btn-sm edit-loadout-btn" data-id="${l.id}">
+              <i class="fas fa-edit"></i> Edit
+            </button>
+            <button class="btn btn-danger btn-sm delete-loadout-btn" data-id="${l.id}">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>`;
+    }).join('');
 
-    // Edit handlers
     list.querySelectorAll('.edit-loadout-btn').forEach(btn => {
       btn.addEventListener('click', () => editLoadout(btn.dataset.id));
     });
-
-    // Delete handlers
     list.querySelectorAll('.delete-loadout-btn').forEach(btn => {
       btn.addEventListener('click', () => deleteLoadout(btn.dataset.id));
     });
@@ -164,13 +161,13 @@ function initLoadoutManager() {
     if (!item) return;
 
     idField.value = id;
-    document.getElementById('loadoutTitle').value = item.title;
-    document.getElementById('loadoutCode').value  = item.code;
-    document.getElementById('loadoutFormTitle').textContent = 'Edit Loadout';
+    document.getElementById('loadoutTitle').value    = item.title    || '';
+    document.getElementById('loadoutCode').value     = item.code     || '';
+    document.getElementById('loadoutCategory').value = item.category || '';
+    document.getElementById('loadoutFeatured').checked = !!item.featured;
+    document.getElementById('loadoutFormTitle').textContent  = 'Edit Loadout';
     document.getElementById('loadoutSubmitText').textContent = 'Update Loadout';
     cancelBtn.style.display = 'inline-flex';
-
-    // Scroll to form
     document.getElementById('section-loadouts').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
@@ -185,20 +182,25 @@ function initLoadoutManager() {
 
   form.addEventListener('submit', e => {
     e.preventDefault();
-    const title = document.getElementById('loadoutTitle').value.trim();
-    const code  = document.getElementById('loadoutCode').value.trim();
+    const title    = document.getElementById('loadoutTitle').value.trim();
+    const code     = document.getElementById('loadoutCode').value.trim();
+    const category = document.getElementById('loadoutCategory').value.trim();
+    const featured = document.getElementById('loadoutFeatured').checked;
     if (!title || !code) return;
 
     let loadouts = window.dfApp.getData('loadouts') || window.dfApp.DEFAULT_DATA.loadouts;
     const existingId = idField.value;
 
+    /* Only one featured at a time */
+    if (featured) {
+      loadouts = loadouts.map(l => ({ ...l, featured: false }));
+    }
+
     if (existingId) {
-      // Update
-      loadouts = loadouts.map(l => l.id === existingId ? { ...l, title, code } : l);
+      loadouts = loadouts.map(l => l.id === existingId ? { ...l, title, code, category, featured } : l);
       showAdminToast('Loadout updated successfully!');
     } else {
-      // Add
-      loadouts.push({ id: generateId(), title, code });
+      loadouts.push({ id: generateId(), title, code, category, featured });
       showAdminToast('Loadout added successfully!');
     }
 
@@ -208,7 +210,6 @@ function initLoadoutManager() {
   });
 
   cancelBtn.addEventListener('click', resetForm);
-
   renderList();
 }
 
@@ -217,7 +218,6 @@ function initSettingsManager() {
   const form = document.getElementById('settingsForm');
   if (!form) return;
 
-  // Load existing values
   function loadSettings() {
     const s = window.dfApp.getData('settings') || window.dfApp.DEFAULT_DATA.settings;
     document.getElementById('settingResolution').value  = s.resolution  || '';
@@ -262,6 +262,51 @@ function initAchievementManager() {
   const form      = document.getElementById('achievementForm');
   const cancelBtn = document.getElementById('achievementCancelBtn');
   const idField   = document.getElementById('achievementId');
+  const photoInput = document.getElementById('achievementPhotos');
+  const previewEl  = document.getElementById('achievementPhotoPreview');
+
+  let pendingPhotos = []; /* array of base64 strings */
+
+  function renderPhotoPreview() {
+    if (!previewEl) return;
+    if (pendingPhotos.length === 0) { previewEl.innerHTML = ''; return; }
+    previewEl.innerHTML = pendingPhotos.map((src, i) => `
+      <div class="photo-preview-item">
+        <img src="${window.dfApp.escHtml(src)}" alt="preview" />
+        <button type="button" class="photo-preview-remove" data-index="${i}" title="Remove">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    `).join('');
+    previewEl.querySelectorAll('.photo-preview-remove').forEach(btn => {
+      btn.addEventListener('click', () => {
+        pendingPhotos.splice(Number(btn.dataset.index), 1);
+        renderPhotoPreview();
+      });
+    });
+  }
+
+  if (photoInput) {
+    photoInput.addEventListener('change', () => {
+      const files = Array.from(photoInput.files);
+      const remaining = 5 - pendingPhotos.length;
+      const toProcess = files.slice(0, remaining);
+
+      if (files.length > remaining) {
+        showAdminToast(`Max 5 photos. Only first ${remaining} added.`, 'error');
+      }
+
+      toProcess.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = e => {
+          pendingPhotos.push(e.target.result);
+          renderPhotoPreview();
+        };
+        reader.readAsDataURL(file);
+      });
+      photoInput.value = '';
+    });
+  }
 
   function renderList() {
     const achievements = window.dfApp.getData('achievements') || window.dfApp.DEFAULT_DATA.achievements;
@@ -276,9 +321,9 @@ function initAchievementManager() {
     list.innerHTML = achievements.map(a => `
       <div class="admin-list-item ${a.visible ? '' : 'hidden-item'}" data-id="${a.id}">
         <div class="admin-list-item-info">
-          <div class="admin-list-item-title">${window.dfApp.escHtml(a.title)}</div>
-          <div class="admin-list-item-meta">${window.dfApp.escHtml(a.description)}</div>
-          ${a.date ? `<div class="admin-list-item-meta" style="margin-top:.15rem;"><i class="fas fa-calendar-alt" style="color:var(--text-muted)"></i> ${window.dfApp.escHtml(a.date)}</div>` : ''}
+          <div class="admin-list-item-title">${window.dfApp.escHtml(a.placement || '—')} — ${window.dfApp.escHtml(a.tournament || '')}</div>
+          <div class="admin-list-item-meta">${window.dfApp.escHtml(a.monthYear || '')}${a.team ? ' · ' + window.dfApp.escHtml(a.team) : ''}</div>
+          ${(a.photos && a.photos.length) ? `<div class="admin-list-item-meta"><i class="fas fa-image"></i> ${a.photos.length} photo${a.photos.length > 1 ? 's' : ''}</div>` : ''}
         </div>
         <div class="admin-list-item-actions">
           <span class="visibility-badge ${a.visible ? 'visible' : 'hidden'}">
@@ -311,8 +356,10 @@ function initAchievementManager() {
 
   function resetForm() {
     form.reset();
-    idField.value = '';
-    document.getElementById('achievementFormTitle').textContent = 'Add New Achievement';
+    idField.value  = '';
+    pendingPhotos  = [];
+    renderPhotoPreview();
+    document.getElementById('achievementFormTitle').textContent  = 'Add New Achievement';
     document.getElementById('achievementSubmitText').textContent = 'Add Achievement';
     cancelBtn.style.display = 'none';
   }
@@ -323,9 +370,13 @@ function initAchievementManager() {
     if (!item) return;
 
     idField.value = id;
-    document.getElementById('achievementTitle').value = item.title;
-    document.getElementById('achievementDesc').value  = item.description;
-    document.getElementById('achievementDate').value  = item.date || '';
+    document.getElementById('achievementPlacement').value  = item.placement  || '';
+    document.getElementById('achievementTournament').value = item.tournament  || '';
+    document.getElementById('achievementMonthYear').value  = item.monthYear   || '';
+    document.getElementById('achievementTeam').value       = item.team        || '';
+    document.getElementById('achievementDesc').value       = item.description || '';
+    pendingPhotos = Array.isArray(item.photos) ? [...item.photos] : [];
+    renderPhotoPreview();
     document.getElementById('achievementFormTitle').textContent  = 'Edit Achievement';
     document.getElementById('achievementSubmitText').textContent = 'Update Achievement';
     cancelBtn.style.display = 'inline-flex';
@@ -352,19 +403,28 @@ function initAchievementManager() {
 
   form.addEventListener('submit', e => {
     e.preventDefault();
-    const title       = document.getElementById('achievementTitle').value.trim();
+    const placement   = document.getElementById('achievementPlacement').value.trim();
+    const tournament  = document.getElementById('achievementTournament').value.trim();
+    const monthYear   = document.getElementById('achievementMonthYear').value.trim();
+    const team        = document.getElementById('achievementTeam').value.trim();
     const description = document.getElementById('achievementDesc').value.trim();
-    const date        = document.getElementById('achievementDate').value;
-    if (!title || !description) return;
+    if (!placement || !tournament || !monthYear) return;
 
     let achievements = window.dfApp.getData('achievements') || window.dfApp.DEFAULT_DATA.achievements;
     const existingId = idField.value;
+    const photos     = pendingPhotos.slice(0, 5);
 
     if (existingId) {
-      achievements = achievements.map(a => a.id === existingId ? { ...a, title, description, date } : a);
+      achievements = achievements.map(a =>
+        a.id === existingId ? { ...a, placement, tournament, monthYear, team, description, photos } : a
+      );
       showAdminToast('Achievement updated successfully!');
     } else {
-      achievements.push({ id: generateId(), title, description, date, visible: true });
+      achievements.push({
+        id: generateId(),
+        placement, tournament, monthYear, team, description, photos,
+        visible: true
+      });
       showAdminToast('Achievement added successfully!');
     }
 
@@ -443,6 +503,117 @@ function initProfileManager() {
   loadProfile();
 }
 
+/* ── SOCIAL LINKS MANAGEMENT ─────────────────────────────── */
+function initSocialManager() {
+  const form = document.getElementById('socialForm');
+  if (!form) return;
+
+  function loadSocial() {
+    const s = window.dfApp.getData('socialLinks') || window.dfApp.DEFAULT_DATA.socialLinks;
+    document.getElementById('socialYoutube').value   = s.youtube   || '';
+    document.getElementById('socialTiktok').value    = s.tiktok    || '';
+    document.getElementById('socialSociabuzz').value = s.sociabuzz || '';
+    document.getElementById('socialWhatsapp').value  = s.whatsapp  || '';
+    document.getElementById('socialEmail').value     = s.email     || '';
+  }
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const socialLinks = {
+      youtube:   document.getElementById('socialYoutube').value.trim(),
+      tiktok:    document.getElementById('socialTiktok').value.trim(),
+      sociabuzz: document.getElementById('socialSociabuzz').value.trim(),
+      whatsapp:  document.getElementById('socialWhatsapp').value.trim(),
+      email:     document.getElementById('socialEmail').value.trim()
+    };
+    saveData('socialLinks', socialLinks);
+    showAdminToast('Social links saved!');
+  });
+
+  loadSocial();
+}
+
+/* ── STATS MANAGEMENT ────────────────────────────────────── */
+function initStatsManager() {
+  const form       = document.getElementById('statsForm');
+  const fieldsEl   = document.getElementById('statsFormFields');
+  const addStatBtn = document.getElementById('addStatBtn');
+  if (!form || !fieldsEl) return;
+
+  function loadStats() {
+    const stats = window.dfApp.getData('stats') || window.dfApp.DEFAULT_DATA.stats;
+    renderStatFields(stats);
+  }
+
+  function renderStatFields(stats) {
+    fieldsEl.innerHTML = stats.map((s, i) => `
+      <div class="stat-field-row" data-index="${i}">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="label-sm">Stat Name</label>
+            <input type="text" class="stat-name-input" value="${window.dfApp.escHtml(s.name)}" placeholder="e.g. Aim Accuracy" />
+          </div>
+          <div class="form-group" style="max-width:120px;">
+            <label class="label-sm">Value (0–100)</label>
+            <input type="number" class="stat-value-input" value="${Number(s.value) || 0}" min="0" max="100" />
+          </div>
+          <div class="form-group" style="max-width:50px;display:flex;align-items:flex-end;padding-bottom:.1rem;">
+            <button type="button" class="btn btn-danger btn-sm delete-stat-btn" title="Remove stat">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    fieldsEl.querySelectorAll('.delete-stat-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        btn.closest('.stat-field-row').remove();
+      });
+    });
+  }
+
+  if (addStatBtn) {
+    addStatBtn.addEventListener('click', () => {
+      const row = document.createElement('div');
+      row.className = 'stat-field-row';
+      row.innerHTML = `
+        <div class="form-row">
+          <div class="form-group">
+            <label class="label-sm">Stat Name</label>
+            <input type="text" class="stat-name-input" placeholder="e.g. Aim Accuracy" />
+          </div>
+          <div class="form-group" style="max-width:120px;">
+            <label class="label-sm">Value (0–100)</label>
+            <input type="number" class="stat-value-input" value="50" min="0" max="100" />
+          </div>
+          <div class="form-group" style="max-width:50px;display:flex;align-items:flex-end;padding-bottom:.1rem;">
+            <button type="button" class="btn btn-danger btn-sm delete-stat-btn" title="Remove stat">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>`;
+      row.querySelector('.delete-stat-btn').addEventListener('click', () => row.remove());
+      fieldsEl.appendChild(row);
+    });
+  }
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const rows  = fieldsEl.querySelectorAll('.stat-field-row');
+    const stats = [];
+    rows.forEach(row => {
+      const name  = row.querySelector('.stat-name-input').value.trim();
+      const value = Math.min(100, Math.max(0, parseInt(row.querySelector('.stat-value-input').value, 10) || 0));
+      if (name) stats.push({ name, value });
+    });
+    saveData('stats', stats);
+    showAdminToast('Stats saved successfully!');
+  });
+
+  loadStats();
+}
+
 /* ── INIT ALL ────────────────────────────────────────────── */
 function initAdminApp() {
   initSidebarNav();
@@ -451,6 +622,8 @@ function initAdminApp() {
   initAchievementManager();
   initPcSpecsManager();
   initProfileManager();
+  initSocialManager();
+  initStatsManager();
 }
 
 /* ── BOOT ────────────────────────────────────────────────── */

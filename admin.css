@@ -1,5 +1,5 @@
 /* ============================================================
-   admin.css — d0pper_dfloadout Admin Panel Styles
+   admin.css — GUNSMITH DELTAFORCE by D0PPER. Admin Panel Styles
    ============================================================ */
 
 /* ── LOGIN OVERLAY ───────────────────────────────────────── */
@@ -13,8 +13,8 @@
   z-index: 10000;
   padding: 1rem;
   background-image:
-    linear-gradient(rgba(74, 103, 65, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(74, 103, 65, 0.05) 1px, transparent 1px);
+    linear-gradient(rgba(15, 247, 150, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 247, 150, 0.05) 1px, transparent 1px);
   background-size: 40px 40px;
 }
 
@@ -51,7 +51,7 @@
 
 .login-logo h2 {
   font-family: 'Rajdhani', sans-serif;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: var(--accent);
   text-transform: uppercase;
@@ -226,11 +226,171 @@
   gap: 1rem;
 }
 
+.form-group-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 .form-actions {
   display: flex;
   gap: 0.75rem;
   margin-top: 0.5rem;
+  flex-wrap: wrap;
 }
+
+/* ── FILE INPUT ──────────────────────────────────────────── */
+.file-input {
+  padding: 0.5rem 0.75rem !important;
+  cursor: pointer;
+}
+
+.file-input::file-selector-button {
+  background: var(--accent2);
+  color: #0a0e0a;
+  border: none;
+  border-radius: 4px;
+  padding: 0.3rem 0.75rem;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  margin-right: 0.75rem;
+  transition: background 0.2s;
+}
+
+.file-input::file-selector-button:hover {
+  background: var(--accent);
+}
+
+/* ── PHOTO PREVIEW ROW ───────────────────────────────────── */
+.photo-preview-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+
+.photo-preview-item {
+  position: relative;
+  width: 70px;
+  height: 70px;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.photo-preview-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-preview-remove {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: rgba(0,0,0,0.7);
+  border: none;
+  color: #fff;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.65rem;
+  transition: background 0.2s;
+}
+
+.photo-preview-remove:hover { background: var(--danger); }
+
+/* ── TOGGLE SWITCH ───────────────────────────────────────── */
+.toggle-label {
+  display: flex !important;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  user-select: none;
+  flex-direction: row !important;
+  text-transform: none !important;
+  font-size: 0.875rem !important;
+  margin-top: 0.4rem;
+}
+
+.toggle-label input[type="checkbox"] {
+  display: none;
+  width: auto !important;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 42px;
+  height: 24px;
+  background: var(--border-color);
+  border-radius: 12px;
+  transition: background 0.25s;
+  flex-shrink: 0;
+}
+
+.toggle-switch::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.25s;
+}
+
+.toggle-label input[type="checkbox"]:checked + .toggle-switch {
+  background: var(--accent2);
+}
+
+.toggle-label input[type="checkbox"]:checked + .toggle-switch::after {
+  transform: translateX(18px);
+}
+
+.toggle-text {
+  color: var(--text-secondary);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* ── ADMIN TAGS ──────────────────────────────────────────── */
+.admin-tag {
+  display: inline-block;
+  padding: 0.1rem 0.45rem;
+  background: rgba(15, 247, 150, 0.1);
+  border: 1px solid var(--accent2);
+  color: var(--accent2);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 3px;
+  vertical-align: middle;
+  margin-left: 0.3rem;
+}
+
+.featured-tag {
+  background: rgba(200, 170, 62, 0.12);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ── STATS FORM ROWS ─────────────────────────────────────── */
+.stat-field-row + .stat-field-row { margin-top: -0.25rem; }
 
 /* ── ADMIN LIST (loadouts/achievements) ──────────────────── */
 .admin-list { display: flex; flex-direction: column; gap: 0.75rem; }
@@ -286,6 +446,8 @@
   display: flex;
   gap: 0.5rem;
   flex-shrink: 0;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 .visibility-badge {
