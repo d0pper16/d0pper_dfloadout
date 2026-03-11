@@ -446,6 +446,7 @@ function initPcSpecsManager() {
     document.getElementById('specMouse').value    = s.mouse    || '';
     document.getElementById('specKeyboard').value = s.keyboard || '';
     document.getElementById('specHeadset').value  = s.headset  || '';
+    document.getElementById('specMousepad').value = s.mousepad || '';
   }
 
   form.addEventListener('submit', e => {
@@ -457,7 +458,8 @@ function initPcSpecsManager() {
       monitor:  document.getElementById('specMonitor').value.trim(),
       mouse:    document.getElementById('specMouse').value.trim(),
       keyboard: document.getElementById('specKeyboard').value.trim(),
-      headset:  document.getElementById('specHeadset').value.trim()
+      headset:  document.getElementById('specHeadset').value.trim(),
+      mousepad: document.getElementById('specMousepad').value.trim()
     };
     saveData('pcSpecs', pcSpecs);
     showAdminToast('PC Specs saved successfully!');
@@ -471,25 +473,71 @@ function initProfileManager() {
   const form = document.getElementById('profileForm');
   if (!form) return;
 
+  const photoInput   = document.getElementById('profilePhotoInput');
+  const photoPreview = document.getElementById('profilePhotoPreview');
+  const photoData    = document.getElementById('profilePhotoData');
+  const clearBtn     = document.getElementById('clearPhotoBtn');
+
   function loadProfile() {
     const p = window.dfApp.getData('profile') || window.dfApp.DEFAULT_DATA.profile;
     document.getElementById('profileNickname').value  = p.nickname   || '';
-    document.getElementById('profilePlayerId').value  = p.playerId   || '';
-    document.getElementById('profileRank').value      = p.rank       || '';
+    document.getElementById('profileTeam').value      = p.team       || '';
     document.getElementById('profileRegion').value    = p.region     || '';
     document.getElementById('profilePlaystyle').value = p.playstyle  || '';
+    document.getElementById('profileBirthplace').value = p.birthplace || '';
+    document.getElementById('profileBirthday').value  = p.birthday   || '';
     document.getElementById('profileBio').value       = p.bio        || '';
+    document.getElementById('profilePlayerId').value  = p.playerId   || '';
+    document.getElementById('profileRank').value      = p.rank       || '';
+
+    if (p.displayPhoto) {
+      photoData.value = p.displayPhoto;
+      photoPreview.src = p.displayPhoto;
+      photoPreview.style.display = 'block';
+    }
+  }
+
+  if (photoInput) {
+    photoInput.addEventListener('change', function() {
+      const file = this.files[0];
+      if (!file) return;
+      if (file.size > 2 * 1024 * 1024) {
+        showAdminToast('Photo too large (max 2MB)', 'error');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = e => {
+        photoPreview.src = e.target.result;
+        photoPreview.style.display = 'block';
+        photoData.value = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      photoData.value = '';
+      photoPreview.src = '';
+      photoPreview.style.display = 'none';
+      if (photoInput) photoInput.value = '';
+      showAdminToast('Photo cleared.');
+    });
   }
 
   form.addEventListener('submit', e => {
     e.preventDefault();
     const profile = {
-      nickname:  document.getElementById('profileNickname').value.trim(),
-      playerId:  document.getElementById('profilePlayerId').value.trim(),
-      rank:      document.getElementById('profileRank').value.trim(),
-      region:    document.getElementById('profileRegion').value.trim(),
-      playstyle: document.getElementById('profilePlaystyle').value.trim(),
-      bio:       document.getElementById('profileBio').value.trim()
+      nickname:     document.getElementById('profileNickname').value.trim(),
+      team:         document.getElementById('profileTeam').value.trim(),
+      region:       document.getElementById('profileRegion').value.trim(),
+      playstyle:    document.getElementById('profilePlaystyle').value.trim(),
+      birthplace:   document.getElementById('profileBirthplace').value.trim(),
+      birthday:     document.getElementById('profileBirthday').value.trim(),
+      bio:          document.getElementById('profileBio').value.trim(),
+      displayPhoto: photoData ? photoData.value : '',
+      playerId:     document.getElementById('profilePlayerId').value,
+      rank:         document.getElementById('profileRank').value
     };
     saveData('profile', profile);
     showAdminToast('Profile saved successfully!');
@@ -709,15 +757,71 @@ function initTestimonialManager() {
   const idField = document.getElementById('testimonialId');
   if (!form) return;
 
+  function renderPendingList() {
+    const testimonials = window.dfApp.getData('testimonials') || [];
+    const pending = testimonials.filter(t => t.pending);
+    const list = document.getElementById('pendingTestimonialList');
+    if (!list) return;
+
+    if (pending.length === 0) {
+      list.innerHTML = '<p style="color:var(--text-muted);font-size:.9rem;text-align:center;padding:1rem;">No pending comments.</p>';
+      return;
+    }
+
+    list.innerHTML = pending.map(t => `
+      <div class="admin-list-item" data-id="${t.id}" style="border-left:3px solid #fbbf24;">
+        <div class="admin-list-item-info">
+          <div class="admin-list-item-title">${window.dfApp.escHtml(t.senderName)} <span class="pending-badge">Pending</span></div>
+          <div class="admin-list-item-sub">${window.dfApp.escHtml(t.message)}</div>
+        </div>
+        <div class="admin-list-item-actions">
+          <button class="btn btn-success btn-sm approve-testimonial-btn" data-id="${t.id}">
+            <i class="fas fa-check"></i> Approve
+          </button>
+          <button class="btn btn-danger btn-sm reject-testimonial-btn" data-id="${t.id}">
+            <i class="fas fa-times"></i> Reject
+          </button>
+        </div>
+      </div>`).join('');
+
+    list.querySelectorAll('.approve-testimonial-btn').forEach(btn =>
+      btn.addEventListener('click', () => approveTestimonial(btn.dataset.id))
+    );
+    list.querySelectorAll('.reject-testimonial-btn').forEach(btn =>
+      btn.addEventListener('click', () => rejectTestimonial(btn.dataset.id))
+    );
+  }
+
+  function approveTestimonial(id) {
+    let testimonials = window.dfApp.getData('testimonials') || [];
+    testimonials = testimonials.map(t =>
+      t.id === id ? { ...t, pending: false, visible: true } : t
+    );
+    saveData('testimonials', testimonials);
+    renderPendingList();
+    renderList();
+    showAdminToast('Comment approved and published!');
+  }
+
+  function rejectTestimonial(id) {
+    if (!confirm('Reject and delete this comment?')) return;
+    let testimonials = (window.dfApp.getData('testimonials') || []).filter(t => t.id !== id);
+    saveData('testimonials', testimonials);
+    renderPendingList();
+    renderList();
+    showAdminToast('Comment rejected.');
+  }
+
   function renderList() {
     const testimonials = window.dfApp.getData('testimonials') || [];
+    const approved = testimonials.filter(t => !t.pending);
     const list = document.getElementById('testimonialList');
     if (!list) return;
-    if (testimonials.length === 0) {
+    if (approved.length === 0) {
       list.innerHTML = '<p style="color:var(--text-muted);font-size:.9rem;text-align:center;padding:1rem;">No testimonials yet.</p>';
       return;
     }
-    list.innerHTML = testimonials.map(t => {
+    list.innerHTML = approved.map(t => {
       const visTag = t.visible
         ? '<span class="admin-tag" style="background:rgba(15,247,150,.15);color:#0ff796">👁 Visible</span>'
         : '<span class="admin-tag" style="background:rgba(255,80,80,.15);color:#f87171">🚫 Hidden</span>';
@@ -784,10 +888,10 @@ function initTestimonialManager() {
     let testimonials = window.dfApp.getData('testimonials') || [];
     const existingId = idField.value;
     if (existingId) {
-      testimonials = testimonials.map(t => t.id === existingId ? { ...t, senderName, message, censored, visible } : t);
+      testimonials = testimonials.map(t => t.id === existingId ? { ...t, senderName, message, censored, visible, pending: false } : t);
       showAdminToast('Testimonial updated!');
     } else {
-      testimonials.push({ id: generateId(), senderName, message, censored, visible });
+      testimonials.push({ id: generateId(), senderName, message, censored, visible, pending: false });
       showAdminToast('Testimonial added!');
     }
     saveData('testimonials', testimonials);
@@ -796,6 +900,7 @@ function initTestimonialManager() {
   });
 
   cancelBtn.addEventListener('click', resetForm);
+  renderPendingList();
   renderList();
 }
 
@@ -911,6 +1016,115 @@ function initSeasonStatsManager() {
   renderList();
 }
 
+/* ── TEAM HISTORY MANAGEMENT ─────────────────────────────── */
+function initTeamHistoryManager() {
+  const form = document.getElementById('teamHistoryForm');
+  const list = document.getElementById('teamHistoryList');
+  if (!form) return;
+
+  let editingId = null;
+
+  function loadTeamHistory() {
+    const data = window.dfApp.getData('teamHistory') || window.dfApp.DEFAULT_DATA.teamHistory || [];
+    renderList(data);
+  }
+
+  function renderList(items) {
+    if (!list) return;
+    if (!items.length) {
+      list.innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><p>No team history entries yet.</p></div>';
+      return;
+    }
+    list.innerHTML = items.map(item => `
+      <div class="admin-list-item">
+        <div class="admin-list-item-info">
+          <div class="admin-list-item-title">${window.dfApp.escHtml(item.teamName)} — ${window.dfApp.escHtml(item.role)}</div>
+          <div class="admin-list-item-meta">${window.dfApp.escHtml(item.periodStart)} — ${window.dfApp.escHtml(item.periodEnd)} · <span style="color:${item.status === 'active' ? '#0ff796' : 'var(--text-muted)'}">${item.status}</span></div>
+        </div>
+        <div class="admin-list-item-actions">
+          <button class="btn btn-outline btn-sm edit-team-btn" data-id="${item.id}"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-danger btn-sm delete-team-btn" data-id="${item.id}"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>
+    `).join('');
+
+    list.querySelectorAll('.edit-team-btn').forEach(btn =>
+      btn.addEventListener('click', () => editTeamEntry(btn.dataset.id))
+    );
+    list.querySelectorAll('.delete-team-btn').forEach(btn =>
+      btn.addEventListener('click', () => deleteTeamEntry(btn.dataset.id))
+    );
+  }
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const data = window.dfApp.getData('teamHistory') || window.dfApp.DEFAULT_DATA.teamHistory || [];
+    const entry = {
+      id:          editingId || generateId(),
+      teamName:    document.getElementById('teamName').value.trim(),
+      role:        document.getElementById('teamRole').value.trim(),
+      periodStart: document.getElementById('teamPeriodStart').value.trim(),
+      periodEnd:   document.getElementById('teamPeriodEnd').value.trim(),
+      status:      document.getElementById('teamStatus').value,
+      description: document.getElementById('teamDesc').value.trim()
+    };
+
+    if (!entry.teamName || !entry.role) return;
+
+    let updated;
+    if (editingId) {
+      updated = data.map(d => d.id === editingId ? entry : d);
+      showAdminToast('Team entry updated!');
+    } else {
+      updated = [...data, entry];
+      showAdminToast('Team entry added!');
+    }
+
+    saveData('teamHistory', updated);
+    form.reset();
+    editingId = null;
+    document.getElementById('teamHistorySubmitText').textContent = 'Add Entry';
+    document.getElementById('teamHistoryCancelBtn').style.display = 'none';
+    document.getElementById('teamHistoryFormTitle').textContent = 'Add Team Entry';
+    loadTeamHistory();
+  });
+
+  document.getElementById('teamHistoryCancelBtn').addEventListener('click', () => {
+    form.reset();
+    editingId = null;
+    document.getElementById('teamHistorySubmitText').textContent = 'Add Entry';
+    document.getElementById('teamHistoryCancelBtn').style.display = 'none';
+    document.getElementById('teamHistoryFormTitle').textContent = 'Add Team Entry';
+  });
+
+  function editTeamEntry(id) {
+    const data = window.dfApp.getData('teamHistory') || window.dfApp.DEFAULT_DATA.teamHistory || [];
+    const item = data.find(d => d.id === id);
+    if (!item) return;
+    editingId = id;
+    document.getElementById('teamName').value        = item.teamName    || '';
+    document.getElementById('teamRole').value        = item.role        || '';
+    document.getElementById('teamPeriodStart').value = item.periodStart || '';
+    document.getElementById('teamPeriodEnd').value   = item.periodEnd   || '';
+    document.getElementById('teamStatus').value      = item.status      || 'active';
+    document.getElementById('teamDesc').value        = item.description || '';
+    document.getElementById('teamHistorySubmitText').textContent = 'Update Entry';
+    document.getElementById('teamHistoryCancelBtn').style.display = '';
+    document.getElementById('teamHistoryFormTitle').textContent = 'Edit Team Entry';
+    document.getElementById('section-teamHistory').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function deleteTeamEntry(id) {
+    if (!confirm('Delete this team history entry?')) return;
+    const data = (window.dfApp.getData('teamHistory') || window.dfApp.DEFAULT_DATA.teamHistory || []).filter(d => d.id !== id);
+    saveData('teamHistory', data);
+    loadTeamHistory();
+    showAdminToast('Entry deleted.');
+  }
+
+  loadTeamHistory();
+}
+
 /* ── VISITOR COUNTER MANAGEMENT ──────────────────────────── */
 function initCounterManager() {
   const baseInput = document.getElementById('counterBase');
@@ -974,6 +1188,7 @@ function initAdminApp() {
   initClipManager();
   initTestimonialManager();
   initSeasonStatsManager();
+  initTeamHistoryManager();
   initCounterManager();
 }
 

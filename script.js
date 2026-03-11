@@ -48,15 +48,20 @@ const DEFAULT_DATA = {
     monitor:  '27" 1080p 165Hz',
     mouse:    'Logitech G Pro X Superlight',
     keyboard: 'Corsair K95 RGB Platinum',
-    headset:  'HyperX Cloud II Wireless'
+    headset:  'HyperX Cloud II Wireless',
+    mousepad: 'Logitech G840 XL'
   },
   profile: {
-    nickname:  'd0pper',
-    playerId:  'DF-882741',
-    rank:      'Elite IV',
-    region:    'SEA',
-    playstyle: 'Aggressive Assault',
-    bio:       'Delta Force veteran focused on aggressive entry tactics and tight-quarters combat. Specializing in CQB loadouts and high-pressure engagements. Always pushing.'
+    nickname:     'd0pper',
+    playerId:     'DF-882741',
+    rank:         'Elite IV',
+    region:       'SEA',
+    playstyle:    'Aggressive Assault',
+    bio:          'Delta Force veteran focused on aggressive entry tactics and tight-quarters combat. Specializing in CQB loadouts and high-pressure engagements. Always pushing.',
+    team:         'Team Alpha',
+    birthplace:   'Jakarta',
+    birthday:     '15 Maret',
+    displayPhoto: ''
   },
   socialLinks: {
     youtube:   '#',
@@ -89,6 +94,17 @@ const DEFAULT_DATA = {
       victoryUnite: { kpm: 3.5, spm: 240 },
       radar: { shooting: 85, survival: 72, coop: 68, objective: 78, vehicle: 50 }
     }
+  ],
+  teamHistory: [
+    {
+      id: 'team-001',
+      teamName: 'Team Alpha',
+      role: 'Entry Fragger',
+      periodStart: 'Jan 2024',
+      periodEnd: 'Present',
+      status: 'active',
+      description: 'Current main team for competitive play.'
+    }
   ]
 };
 
@@ -99,6 +115,15 @@ function getData(key) {
     return raw ? JSON.parse(raw) : null;
   } catch (e) {
     return null;
+  }
+}
+
+function saveData(key, value) {
+  try {
+    localStorage.setItem('dfloadout_' + key, JSON.stringify(value));
+    return true;
+  } catch (e) {
+    return false;
   }
 }
 
@@ -113,29 +138,36 @@ function getAllData() {
     stats:        getData('stats')        || DEFAULT_DATA.stats,
     clips:        getData('clips')        || DEFAULT_DATA.clips,
     testimonials: getData('testimonials') || DEFAULT_DATA.testimonials,
-    seasonStats:  getData('seasonStats')  || DEFAULT_DATA.seasonStats
+    seasonStats:  getData('seasonStats')  || DEFAULT_DATA.seasonStats,
+    teamHistory:  getData('teamHistory')  || DEFAULT_DATA.teamHistory
   };
 }
 
-/* ── THEME MANAGEMENT ────────────────────────────────────── */
-function initTheme() {
-  const saved = localStorage.getItem('dfloadout_theme') || 'dark';
-  applyTheme(saved);
+/* ── HTML ESCAPE ─────────────────────────────────────────── */
+function escHtml(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
 }
 
-function applyTheme(theme) {
-  document.documentElement.setAttribute('data-theme', theme);
-  const icon = document.getElementById('themeIcon');
-  if (icon) {
-    icon.className = theme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+/* ── SANITIZE URL ────────────────────────────────────────── */
+function sanitizeUrl(url) {
+  if (!url) return '#';
+  const trimmed = url.trim();
+  if (trimmed === '#') return '#';
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.protocol === 'https:' || parsed.protocol === 'http:' || parsed.protocol === 'mailto:') {
+      return trimmed;
+    }
+  } catch (e) {
+    if (trimmed.startsWith('mailto:')) return trimmed;
   }
-}
-
-function toggleTheme() {
-  const current = document.documentElement.getAttribute('data-theme') || 'dark';
-  const next = current === 'dark' ? 'light' : 'dark';
-  localStorage.setItem('dfloadout_theme', next);
-  applyTheme(next);
+  return '#';
 }
 
 /* ── TOAST NOTIFICATION ──────────────────────────────────── */
@@ -153,6 +185,7 @@ function showToast(message, type = 'success') {
 function initNavScroll() {
   const sections = document.querySelectorAll('section[id]');
   const navLinks  = document.querySelectorAll('.nav-link');
+  if (!sections.length) return;
 
   window.addEventListener('scroll', () => {
     let current = '';
@@ -217,7 +250,7 @@ function renderSocialLinks(socialLinks) {
   ];
 
   el.innerHTML = links.map(l => {
-    const href = socialLinks[l.key] || '#';
+    const href = sanitizeUrl(socialLinks[l.key]);
     return `<a href="${escHtml(href)}" class="social-btn social-btn-${l.key}" title="${l.label}" target="_blank" rel="noopener noreferrer">
       <i class="${l.icon}"></i>
     </a>`;
@@ -240,14 +273,22 @@ function renderHeroStats(data) {
       <div class="hero-stat-label">Achievements</div>
     </div>
     <div class="hero-stat">
-      <div class="hero-stat-value">${escHtml(data.profile.rank || '—')}</div>
-      <div class="hero-stat-label">Rank</div>
-    </div>
-    <div class="hero-stat">
-      <div class="hero-stat-value">${escHtml(data.profile.region || '—')}</div>
+      <div class="hero-stat-value">🇮🇩 ${escHtml(data.profile.region || '—')}</div>
       <div class="hero-stat-label">Region</div>
     </div>
   `;
+}
+
+/* ── UPDATE HERO SUB TEXT ────────────────────────────────── */
+function updateHeroSub(loadouts) {
+  const el = document.getElementById('heroSub');
+  if (!el) return;
+  const categories = [...new Set(loadouts.map(l => l.category).filter(Boolean))];
+  if (categories.length === 0) {
+    el.textContent = 'player profile, loadout codes, ingame setting, ...';
+    return;
+  }
+  el.textContent = 'player profile, ' + categories.map(c => c.toLowerCase()).join(', ') + ', ingame setting, ...';
 }
 
 /* ── RENDER LOADOUTS ─────────────────────────────────────── */
@@ -269,7 +310,6 @@ function renderLoadouts(loadouts) {
     return;
   }
 
-  /* Build filter bar */
   const categories = ['All', ...new Set(loadouts.map(l => l.category).filter(Boolean))];
   if (filterEl) {
     filterEl.innerHTML = categories.map(cat => `
@@ -293,7 +333,6 @@ function renderLoadouts(loadouts) {
     });
   }
 
-  /* Render favorites */
   const favorites    = loadouts.filter(l => l.featured);
   const nonFavorites = loadouts.filter(l => !l.featured);
 
@@ -323,7 +362,6 @@ function renderLoadouts(loadouts) {
     }
   }
 
-  /* Render non-favorites */
   grid.innerHTML = nonFavorites.map(l => {
     const catTag = l.category ? `<span class="loadout-category-tag">${escHtml(l.category)}</span>` : '';
     return `
@@ -442,7 +480,6 @@ function renderAchievements(achievements) {
       </div>`;
   }).join('');
 
-  /* Photo lightbox triggers */
   grid.querySelectorAll('.photo-thumb').forEach(img => {
     img.style.cursor = 'pointer';
     img.addEventListener('click', () => openLightbox(img.src));
@@ -477,17 +514,21 @@ function renderPcSpecs(specs) {
   const card = document.getElementById('specsCard');
   if (!card) return;
 
-  const items = [
-    { icon: 'fas fa-microchip', label: 'CPU',      value: specs.cpu      },
-    { icon: 'fas fa-film',      label: 'GPU',      value: specs.gpu      },
-    { icon: 'fas fa-memory',    label: 'RAM',      value: specs.ram      },
-    { icon: 'fas fa-tv',        label: 'Monitor',  value: specs.monitor  },
-    { icon: 'fas fa-mouse',     label: 'Mouse',    value: specs.mouse    },
-    { icon: 'fas fa-keyboard',  label: 'Keyboard', value: specs.keyboard },
-    { icon: 'fas fa-headphones',label: 'Headset',  value: specs.headset  }
+  const pcItems = [
+    { icon: 'fas fa-microchip', label: 'CPU',     value: specs.cpu     },
+    { icon: 'fas fa-film',      label: 'GPU',     value: specs.gpu     },
+    { icon: 'fas fa-memory',    label: 'RAM',     value: specs.ram     },
+    { icon: 'fas fa-tv',        label: 'Monitor', value: specs.monitor }
   ];
 
-  card.innerHTML = items.map(item => `
+  const equipItems = [
+    { icon: 'fas fa-mouse',      label: 'Mouse',    value: specs.mouse    },
+    { icon: 'fas fa-keyboard',   label: 'Keyboard', value: specs.keyboard },
+    { icon: 'fas fa-headphones', label: 'Headset',  value: specs.headset  },
+    { icon: 'fas fa-expand',     label: 'Mousepad', value: specs.mousepad }
+  ];
+
+  const renderItem = item => `
     <div class="spec-item">
       <div class="spec-icon"><i class="${item.icon}"></i></div>
       <div class="spec-info">
@@ -495,7 +536,15 @@ function renderPcSpecs(specs) {
         <div class="spec-value">${escHtml(item.value || '—')}</div>
       </div>
     </div>
-  `).join('');
+  `;
+
+  card.innerHTML = `
+    <div class="specs-section-title">⚙️ PC Specs</div>
+    ${pcItems.map(renderItem).join('')}
+    <div class="specs-divider"></div>
+    <div class="specs-section-title">🖱️ Equipment</div>
+    ${equipItems.map(renderItem).join('')}
+  `;
 }
 
 /* ── RENDER STATS ────────────────────────────────────────── */
@@ -520,7 +569,6 @@ function renderStats(stats) {
     </div>
   `).join('');
 
-  /* Intersection Observer to animate fills */
   const fills = el.querySelectorAll('.stat-bar-fill');
   const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
@@ -540,21 +588,35 @@ function renderProfile(profile) {
   const card = document.getElementById('profileCard');
   if (!card) return;
 
-  const metaItems = [
-    { icon: 'fas fa-id-badge',    val: profile.playerId  },
-    { icon: 'fas fa-globe-asia',  val: profile.region    },
-    { icon: 'fas fa-running',     val: profile.playstyle }
-  ].filter(m => m.val);
+  const photoHtml = profile.displayPhoto
+    ? `<img class="profile-photo" src="${escHtml(profile.displayPhoto)}" alt="${escHtml(profile.nickname)}" />`
+    : `<div class="profile-silhouette"><i class="fas fa-user"></i></div>`;
+
+  const teamHtml = profile.team
+    ? `<div class="profile-team"><i class="fas fa-users"></i> ${escHtml(profile.team)}</div>`
+    : '';
+
+  const regionDisplay = profile.region
+    ? `🇮🇩 ${escHtml(profile.region)}`
+    : '—';
+
+  const fields = [
+    profile.region    && { icon: 'fas fa-globe-asia',      val: regionDisplay },
+    profile.playstyle && { icon: 'fas fa-running',          val: escHtml(profile.playstyle) },
+    profile.birthplace && { icon: 'fas fa-map-marker-alt', val: escHtml(profile.birthplace) },
+    profile.birthday  && { icon: 'fas fa-birthday-cake',   val: escHtml(profile.birthday) }
+  ].filter(Boolean);
 
   card.innerHTML = `
-    <div class="profile-avatar"><i class="fas fa-user-astronaut"></i></div>
+    ${photoHtml}
     <div class="profile-nickname">${escHtml(profile.nickname || 'Unknown Player')}</div>
-    ${profile.rank ? `<div class="profile-rank-badge"><i class="fas fa-star"></i> ${escHtml(profile.rank)}</div>` : ''}
+    ${teamHtml}
     <div class="profile-meta">
-      ${metaItems.map(m => `
-        <span class="profile-meta-item">
-          <i class="${m.icon}"></i> ${escHtml(m.val)}
-        </span>
+      ${fields.map(f => `
+        <div class="profile-field">
+          <i class="${f.icon}"></i>
+          <span>${f.val}</span>
+        </div>
       `).join('')}
     </div>
     ${profile.bio ? `<div class="profile-bio">${escHtml(profile.bio)}</div>` : ''}
@@ -606,7 +668,7 @@ function censorName(name) {
 function renderTestimonials(testimonials) {
   const grid = document.getElementById('testimonialsGrid');
   if (!grid) return;
-  const visible = testimonials.filter(t => t.visible);
+  const visible = testimonials.filter(t => t.visible && !t.pending);
   if (visible.length === 0) {
     grid.innerHTML = '<div class="empty-state"><i class="fas fa-comment"></i><p>No testimonials yet.</p></div>';
     return;
@@ -622,9 +684,35 @@ function renderTestimonials(testimonials) {
   }).join('');
 }
 
+/* ── PUBLIC TESTIMONIAL FORM ─────────────────────────────── */
+function initPublicTestimonialForm() {
+  const form = document.getElementById('publicTestimonialForm');
+  if (!form) return;
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const name    = document.getElementById('pubTestName').value.trim();
+    const message = document.getElementById('pubTestMessage').value.trim();
+    if (!name || !message) return;
+
+    const testimonials = getData('testimonials') || DEFAULT_DATA.testimonials;
+    testimonials.push({
+      id:         Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      senderName: name,
+      message:    message,
+      censored:   false,
+      visible:    false,
+      pending:    true
+    });
+    saveData('testimonials', testimonials);
+    form.reset();
+    showToast('Comment submitted! Awaiting approval.');
+  });
+}
+
 /* ── RENDER SEASON STATS ─────────────────────────────────── */
 function buildRadarSVG(radar) {
-  const cx = 110, cy = 110, maxR = 80;
+  const cx = 150, cy = 150, maxR = 120;
   const axes = [
     { key: 'shooting',  label: 'Shooting',  angle: 90 },
     { key: 'survival',  label: 'Survival',  angle: 18 },
@@ -657,14 +745,14 @@ function buildRadarSVG(radar) {
   const dataPolygon = `<polygon points="${dataPoints.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')}" fill="rgba(15,247,150,0.3)" stroke="#0ff796" stroke-width="2"/>`;
   const dataDots = dataPoints.map(p => `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4" fill="#0ff796"/>`).join('');
 
+  const labelR = maxR + 28;
   const labels = axes.map(a => {
-    const labelR = maxR + 22;
     const p = pt(a.angle, labelR);
     const anchor = p.x < cx - 5 ? 'end' : p.x > cx + 5 ? 'start' : 'middle';
-    return `<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" text-anchor="${anchor}" dominant-baseline="middle" fill="rgba(255,255,255,0.8)" font-size="10" font-family="Rajdhani,sans-serif">${a.label}</text>`;
+    return `<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" text-anchor="${anchor}" dominant-baseline="middle" fill="rgba(255,255,255,0.8)" font-size="11" font-family="Rajdhani,sans-serif">${a.label}</text>`;
   }).join('');
 
-  return `<svg class="radar-chart" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+  return `<svg class="radar-chart" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
     ${gridLines}${axisLines}${dataPolygon}${dataDots}${labels}
   </svg>`;
 }
@@ -706,10 +794,35 @@ function renderSeasonStats(seasonStats) {
   }).join('');
 }
 
+/* ── RENDER TEAM HISTORY ─────────────────────────────────── */
+function renderTeamHistory(teamHistory) {
+  const container = document.getElementById('teamHistoryTimeline');
+  if (!container) return;
+
+  if (!teamHistory || teamHistory.length === 0) {
+    container.innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><p>No team history yet.</p></div>';
+    return;
+  }
+
+  container.innerHTML = `<div class="timeline">${teamHistory.map(t => {
+    const isActive = t.status === 'active';
+    return `
+      <div class="timeline-item ${isActive ? 'active-team' : ''}">
+        <div class="timeline-card">
+          <div class="timeline-team-name">${escHtml(t.teamName)}</div>
+          <div class="timeline-role">${escHtml(t.role)}</div>
+          <div class="timeline-period"><i class="fas fa-calendar-alt"></i> ${escHtml(t.periodStart)} — ${escHtml(t.periodEnd)}</div>
+          <span class="timeline-status ${isActive ? 'active' : 'former'}">${isActive ? 'Active' : 'Former'}</span>
+          ${t.description ? `<div class="timeline-desc">${escHtml(t.description)}</div>` : ''}
+        </div>
+      </div>`;
+  }).join('')}</div>`;
+}
+
 /* ── SCROLL ANIMATIONS ───────────────────────────────────── */
 function initScrollAnimations() {
   const targets = document.querySelectorAll(
-    '.loadout-card, .favorite-loadout-card, .achievement-card, .setting-card, .stat-bar-item, .spec-item, .clip-card, .testimonial-card, .season-card'
+    '.loadout-card, .favorite-loadout-card, .achievement-card, .setting-card, .stat-bar-item, .spec-item, .clip-card, .testimonial-card, .season-card, .timeline-item'
   );
 
   const observer = new IntersectionObserver(entries => {
@@ -727,17 +840,6 @@ function initScrollAnimations() {
   });
 }
 
-/* ── HTML ESCAPE ─────────────────────────────────────────── */
-function escHtml(str) {
-  if (str == null) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#x27;');
-}
-
 /* ── FOOTER YEAR ─────────────────────────────────────────── */
 function setFooterYear() {
   const el = document.getElementById('footerYear');
@@ -746,31 +848,76 @@ function setFooterYear() {
 
 /* ── INIT ────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
-  initTheme();
+  /* Skip all public renders if we're on the admin page */
+  if (document.getElementById('loginOverlay')) return;
 
-  const themeBtn = document.getElementById('themeToggle');
-  if (themeBtn) themeBtn.addEventListener('click', toggleTheme);
+  const data = getAllData();
 
-  if (!document.getElementById('loginOverlay')) {
-    const data = getAllData();
-    renderHeroStats(data);
+  initHamburger();
+  setFooterYear();
+
+  /* index.html */
+  if (document.getElementById('heroStats')) {
     initVisitorCounter();
     renderSocialLinks(data.socialLinks);
-    renderLoadouts(data.loadouts);
-    renderSettings(data.settings);
-    renderAchievements(data.achievements);
-    renderPcSpecs(data.pcSpecs);
-    renderStats(data.stats);
-    renderProfile(data.profile);
-    renderClips(data.clips);
-    renderTestimonials(data.testimonials);
-    renderSeasonStats(data.seasonStats);
-    initLightbox();
-    initNavScroll();
-    initHamburger();
-    setFooterYear();
-    initScrollAnimations();
+    renderHeroStats(data);
+    updateHeroSub(data.loadouts);
   }
+
+  /* Achievements (index) */
+  if (document.getElementById('achievementsGrid')) {
+    renderAchievements(data.achievements);
+    initLightbox();
+  }
+
+  /* PC Specs (index) */
+  if (document.getElementById('specsCard')) {
+    renderPcSpecs(data.pcSpecs);
+  }
+
+  /* Settings (index) */
+  if (document.getElementById('settingsDashboard')) {
+    renderSettings(data.settings);
+  }
+
+  /* Clips (index) */
+  if (document.getElementById('clipsGrid')) {
+    renderClips(data.clips);
+  }
+
+  /* Testimonials (index) */
+  if (document.getElementById('testimonialsGrid')) {
+    renderTestimonials(data.testimonials);
+    initPublicTestimonialForm();
+  }
+
+  /* Loadout page */
+  if (document.getElementById('loadoutGrid')) {
+    renderLoadouts(data.loadouts);
+  }
+
+  /* Profile page */
+  if (document.getElementById('profileCard')) {
+    renderProfile(data.profile);
+  }
+
+  /* Season stats page */
+  if (document.getElementById('seasonStatsGrid')) {
+    renderSeasonStats(data.seasonStats);
+  }
+
+  /* Team history page */
+  if (document.getElementById('teamHistoryTimeline')) {
+    renderTeamHistory(data.teamHistory);
+  }
+
+  /* Stats bars (if present) */
+  if (document.getElementById('statsBars')) {
+    renderStats(data.stats);
+  }
+
+  initNavScroll();
+  initScrollAnimations();
 });
 
 /* ── EXPORTS (for admin.js to use) ──────────────────────── */
