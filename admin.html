@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -46,9 +46,6 @@
           <span class="admin-badge">ADMIN</span>
         </a>
         <div class="nav-actions">
-          <button class="theme-toggle" id="themeToggle" title="Toggle Dark/Light Mode">
-            <i class="fas fa-moon" id="themeIcon"></i>
-          </button>
           <a href="index.html" class="btn btn-outline btn-sm">
             <i class="fas fa-eye"></i> View Site
           </a>
@@ -95,6 +92,9 @@
           <li><a href="#" class="admin-nav-link" data-section="seasonStats">
             <i class="fas fa-chart-bar"></i> Season Stats
           </a></li>
+          <li><a href="#" class="admin-nav-link" data-section="teamHistory">
+            <i class="fas fa-users"></i> Team History
+          </a></li>
           <li><a href="#" class="admin-nav-link" data-section="counter">
             <i class="fas fa-eye"></i> Visitor Counter
           </a></li>
@@ -109,8 +109,6 @@
           <div class="admin-section-header">
             <h2><i class="fas fa-crosshairs"></i> Loadout Management</h2>
           </div>
-
-          <!-- Add/Edit Form -->
           <div class="admin-card">
             <h3 id="loadoutFormTitle">Add New Loadout</h3>
             <form id="loadoutForm">
@@ -153,13 +151,9 @@
               </div>
             </form>
           </div>
-
-          <!-- Loadout List -->
           <div class="admin-card">
             <h3>Existing Loadouts</h3>
-            <div id="loadoutList" class="admin-list">
-              <!-- Filled by JS -->
-            </div>
+            <div id="loadoutList" class="admin-list"></div>
           </div>
         </div>
 
@@ -235,8 +229,6 @@
           <div class="admin-section-header">
             <h2><i class="fas fa-trophy"></i> Achievements Management</h2>
           </div>
-
-          <!-- Add/Edit Form -->
           <div class="admin-card">
             <h3 id="achievementFormTitle">Add New Achievement</h3>
             <form id="achievementForm">
@@ -285,23 +277,20 @@
               </div>
             </form>
           </div>
-
-          <!-- Achievement List -->
           <div class="admin-card">
             <h3>Existing Achievements</h3>
-            <div id="achievementList" class="admin-list">
-              <!-- Filled by JS -->
-            </div>
+            <div id="achievementList" class="admin-list"></div>
           </div>
         </div>
 
         <!-- PC SPECS SECTION -->
         <div class="admin-section" id="section-pcspecs">
           <div class="admin-section-header">
-            <h2><i class="fas fa-desktop"></i> PC Specs Management</h2>
+            <h2><i class="fas fa-desktop"></i> PC Specs &amp; Equipment</h2>
           </div>
           <div class="admin-card">
             <form id="pcSpecsForm">
+              <h4 style="color:var(--accent2);margin-bottom:1rem;font-family:'Rajdhani',sans-serif;">⚙️ PC Specs</h4>
               <div class="form-row">
                 <div class="form-group">
                   <label for="specCpu"><i class="fas fa-microchip"></i> CPU</label>
@@ -322,6 +311,7 @@
                   <input type="text" id="specMonitor" placeholder="e.g. 27-inch 1080p 165Hz" />
                 </div>
               </div>
+              <h4 style="color:var(--accent2);margin:1.25rem 0 1rem;font-family:'Rajdhani',sans-serif;">🖱️ Equipment</h4>
               <div class="form-row">
                 <div class="form-group">
                   <label for="specMouse"><i class="fas fa-mouse"></i> Mouse</label>
@@ -336,6 +326,10 @@
                 <div class="form-group">
                   <label for="specHeadset"><i class="fas fa-headphones"></i> Headset</label>
                   <input type="text" id="specHeadset" placeholder="e.g. HyperX Cloud II" />
+                </div>
+                <div class="form-group">
+                  <label for="specMousepad"><i class="fas fa-expand"></i> Mousepad</label>
+                  <input type="text" id="specMousepad" placeholder="e.g. Logitech G840 XL" />
                 </div>
               </div>
               <div class="form-actions">
@@ -354,37 +348,60 @@
           </div>
           <div class="admin-card">
             <form id="profileForm">
+              <!-- Display Photo -->
+              <div class="form-group">
+                <label>Display Photo</label>
+                <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+                  <img id="profilePhotoPreview" src="" alt="Photo preview"
+                    style="display:none;width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);" />
+                  <input type="file" id="profilePhotoInput" accept="image/*" class="file-input" />
+                  <input type="hidden" id="profilePhotoData" />
+                </div>
+                <small style="color:var(--text-muted)">Max 2MB. Stored as base64.</small>
+              </div>
               <div class="form-row">
                 <div class="form-group">
                   <label for="profileNickname">Nickname / In-Game Name</label>
                   <input type="text" id="profileNickname" placeholder="e.g. d0pper" />
                 </div>
                 <div class="form-group">
-                  <label for="profilePlayerId">Player ID</label>
-                  <input type="text" id="profilePlayerId" placeholder="e.g. DF-123456" />
+                  <label for="profileTeam">Current Team</label>
+                  <input type="text" id="profileTeam" placeholder="e.g. Team Alpha" />
                 </div>
               </div>
               <div class="form-row">
                 <div class="form-group">
-                  <label for="profileRank">Rank</label>
-                  <input type="text" id="profileRank" placeholder="e.g. Elite IV" />
-                </div>
-                <div class="form-group">
                   <label for="profileRegion">Region / Server</label>
                   <input type="text" id="profileRegion" placeholder="e.g. SEA" />
                 </div>
+                <div class="form-group">
+                  <label for="profilePlaystyle">Playstyle</label>
+                  <input type="text" id="profilePlaystyle" placeholder="e.g. Aggressive Assault" />
+                </div>
               </div>
-              <div class="form-group">
-                <label for="profilePlaystyle">Playstyle</label>
-                <input type="text" id="profilePlaystyle" placeholder="e.g. Aggressive Assault" />
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="profileBirthplace">Birthplace</label>
+                  <input type="text" id="profileBirthplace" placeholder="e.g. Jakarta" />
+                </div>
+                <div class="form-group">
+                  <label for="profileBirthday">Birthday</label>
+                  <input type="text" id="profileBirthday" placeholder="e.g. 15 Maret" />
+                </div>
               </div>
               <div class="form-group">
                 <label for="profileBio">Bio</label>
                 <textarea id="profileBio" rows="3" placeholder="Short description about your playstyle and goals..."></textarea>
               </div>
+              <!-- Keep playerId and rank as hidden fields to preserve data -->
+              <input type="hidden" id="profilePlayerId" />
+              <input type="hidden" id="profileRank" />
               <div class="form-actions">
                 <button type="submit" class="btn btn-primary">
                   <i class="fas fa-save"></i> Save Profile
+                </button>
+                <button type="button" class="btn btn-outline btn-sm" id="clearPhotoBtn">
+                  <i class="fas fa-times"></i> Clear Photo
                 </button>
               </div>
             </form>
@@ -495,6 +512,14 @@
           <div class="admin-section-header">
             <h2><i class="fas fa-comment"></i> Testimonials Management</h2>
           </div>
+
+          <!-- Pending testimonials -->
+          <div class="admin-card">
+            <h3>⏳ Pending Approval</h3>
+            <p style="font-size:.875rem;color:var(--text-muted);margin-bottom:1rem;">Comments submitted by visitors awaiting your approval.</p>
+            <div id="pendingTestimonialList" class="admin-list"></div>
+          </div>
+
           <div class="admin-card">
             <h3 id="testimonialFormTitle">Add New Testimonial</h3>
             <form id="testimonialForm">
@@ -612,6 +637,61 @@
           <div class="admin-card">
             <h3>Existing Seasons</h3>
             <div id="seasonList" class="admin-list"></div>
+          </div>
+        </div>
+
+        <!-- TEAM HISTORY SECTION -->
+        <div class="admin-section" id="section-teamHistory">
+          <div class="admin-section-header">
+            <h2><i class="fas fa-users"></i> Team History Management</h2>
+          </div>
+          <div class="admin-card">
+            <h3 id="teamHistoryFormTitle">Add Team Entry</h3>
+            <form id="teamHistoryForm">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="teamName">Team Name</label>
+                  <input type="text" id="teamName" placeholder="e.g. Team Alpha" required />
+                </div>
+                <div class="form-group">
+                  <label for="teamRole">Role</label>
+                  <input type="text" id="teamRole" placeholder="e.g. Entry Fragger" required />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="teamPeriodStart">Period Start</label>
+                  <input type="text" id="teamPeriodStart" placeholder="e.g. Jan 2024" required />
+                </div>
+                <div class="form-group">
+                  <label for="teamPeriodEnd">Period End</label>
+                  <input type="text" id="teamPeriodEnd" placeholder="e.g. Present" required />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="teamStatus">Status</label>
+                <select id="teamStatus">
+                  <option value="active">Active</option>
+                  <option value="former">Former</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="teamDesc">Description (optional)</label>
+                <textarea id="teamDesc" rows="2" placeholder="Brief description..."></textarea>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-save"></i> <span id="teamHistorySubmitText">Add Entry</span>
+                </button>
+                <button type="button" class="btn btn-outline" id="teamHistoryCancelBtn" style="display:none">
+                  <i class="fas fa-times"></i> Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+          <div class="admin-card">
+            <h3>Existing Entries</h3>
+            <div id="teamHistoryList" class="admin-list"></div>
           </div>
         </div>
 
