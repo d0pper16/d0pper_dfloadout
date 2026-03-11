@@ -273,7 +273,7 @@ function renderHeroStats(data) {
       <div class="hero-stat-label">Achievements</div>
     </div>
     <div class="hero-stat">
-      <div class="hero-stat-value">🇮🇩 ${escHtml(data.profile.region || '—')}</div>
+      <div class="hero-stat-value"> ${escHtml(data.profile.region || '—')}</div>
       <div class="hero-stat-label">Region</div>
     </div>
   `;
